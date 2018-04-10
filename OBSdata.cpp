@@ -32,6 +32,8 @@ int main (int argc, char * argv[]){
     }
  
    findHeader(inFile);
+   findDoppler(inFile);
+   findDoppler(inFile);
   
    
 // close the files
@@ -72,7 +74,23 @@ int main (int argc, char * argv[]){
  * Parameters: ifstream& file - the file to find the data for
  * Return: void
  */
-void findDoppler(ifstream&){
+void findDoppler(ifstream& file){
      
-       
+     char c;
+// the dopplar frequency should never go above 10,000 Hz
+     double dplr = 10001;
+     
+// get to the next line
+     file >> c;
+     
+     while (c != '\n'){
+       file.read(&c, 1);
+     }
+     
+     while (dplr > 10000 || dplr < -10000)
+        file >> dplr;
+        
+     cout << dplr << endl;
+
+     
 }
