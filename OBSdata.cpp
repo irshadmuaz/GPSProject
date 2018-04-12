@@ -9,10 +9,11 @@
 #include <stdio.h>
 #include <iomanip>
 #include <cstring>
+#include <cmath>
 using namespace std;
 
 void findHeader(ifstream&);
-void findDoppler(ifstream&);
+void getDoppler(ifstream&, ofstream&);
 
 int main (int argc, char * argv[]){
 
@@ -32,8 +33,8 @@ int main (int argc, char * argv[]){
     }
  
    findHeader(inFile);
-   findDoppler(inFile);
-   findDoppler(inFile);
+   getDoppler(inFile, outFile);
+   
   
    
 // close the files
@@ -44,7 +45,7 @@ int main (int argc, char * argv[]){
 }
 
 /*****************************************************************************
- *  Function find Header - positions the file to point to the beginning of the
+ *  Function findHeader - positions the file to point to the beginning of the
  *                         obs data (finds and skips past the header)          
  * Parameters: ifstream& file - the file to find the header for
  * Return: void
@@ -70,27 +71,40 @@ int main (int argc, char * argv[]){
  
  
 /*****************************************************************************
- * Function: findDopplar - finds the dopplar data in the obs file
- * Parameters: ifstream& file - the file to find the data for
+ * Function: getDopplar - finds the dopplar data in the obs file and prints
+ *                        the data to a text file
+ * Parameters: ifstream& inFile - the file to find the data for
+ *             ofstream& outFile - the file to write the dopplar data to
  * Return: void
  */
-void findDoppler(ifstream& file){
-     
-     char c;
+void getDoppler(ifstream& inFile, ofstream& outFile){    
+
 // the dopplar frequency should never go above 10,000 Hz
-     double dplr = 10001;
-     
-// get to the next line
-     file >> c;
-     
-     while (c != '\n'){
-       file.read(&c, 1);
-     }
-     
-     while (dplr > 10000 || dplr < -10000)
-        file >> dplr;
+     double dopplar = 0;
+     string lineHold;
+     unsigned int i = 0;
+     int spaceCount = 0;
+ 
+     while(!inFile.eof()){
+       getline(inFile, lineHold);
+       spaceCount = 0;
+       for(i = 0; i < lineHold.length(); i++){
+          if(isspace(lineHold[i]))
+                spaceCount++;
+       }
         
-     cout << dplr << endl;
+        if (lineHold.length() > 15){
+           dopplar = stod(lineHold.substr(30,39));
+           if(abs(dopplar) > 25)
+              outFile << setprecision(3) << fixed << dopplar << endl;
+          }
+         
+     }
+    
+ }
+     
+
+
 
      
-}
+
