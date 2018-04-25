@@ -152,8 +152,6 @@ void storeDopplar(ifstream& inFile)
               satel_Head = satel_Head.substr(1, satel_Head.length()-1);
         
          satNum = stoi(satel_Head.substr(0,2));
-        // cout << satNum << endl;
-      //   cout << satel_Head << endl;
          storeSection(inFile, satel_Head, satNum, SatNames, dopplarData);
        }
       
@@ -162,7 +160,7 @@ void storeDopplar(ifstream& inFile)
  // lets print out the data
      for(i=0; i < dopplarData.size(); i++)
      {
-       cout << SatNames.at(i) << endl;
+         cout << SatNames.at(i) << endl;
        for(j = 0; j < dopplarData.at(i).size(); j++)
        {
          cout << setprecision(3) << fixed << dopplarData.at(i).at(j) << endl;
@@ -197,6 +195,9 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
 
     for(int i = 0; i < satNum; i++)
     {
+      index = 0;
+      dopplarHold.clear();
+      isNew = true;
       sat_Name = sat_Head.substr(1+(3*i),3);
          
    // Check to see if each satellite has been found before or not
@@ -213,14 +214,15 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
       {
          satellite_Names.push_back(sat_Name);
     // find the dopplar in the dataFile, save to a new column in the 2D vector
-         getline(dataFile, lineHold);
+         getline(dataFile, lineHold); 
          if (lineHold.length() > 15)
          {
            dopplar = stod(lineHold.substr(30,39));
-           dopplarHold.push_back(dopplar);
-           dopplarData.push_back(dopplarHold);
-          // cout << dopplarData.at(dopplarData.size()-1).at(0) << endl;
-       //    cout << setprecision(3) << fixed << dopplar << endl;
+             if(abs(dopplar) > 15)
+             {
+               dopplarHold.push_back(dopplar);
+               dopplarData.push_back(dopplarHold);
+             }
          }
       }
         
@@ -230,7 +232,8 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
          if (lineHold.length() > 15)
          {
             dopplar = stod(lineHold.substr(30,39));
-            dopplarData.at(index).push_back(dopplar);
+            if(abs(dopplar) > 25)
+                dopplarData.at(index).push_back(dopplar);
          }
       }
    }
