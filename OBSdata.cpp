@@ -19,20 +19,25 @@ using namespace std;
 
 void findHeader(ifstream&);
 void getDoppler(ifstream&, ofstream&);
-void storeDopplar(ifstream&);
+void storeDopplar(ifstream&, vector<vector<double>> &, vector<string> &);
 void storeSection(ifstream&, string, int, vector<string>&,
      vector<vector<double>>& dataFile);
+void writeToFiles(vector<vector<double>> &, vector<string> &);
 
-int main (int argc, char * argv[]){
 
+int main (int argc, char * argv[])
+{
+   vector<vector<double>> dopplarData;
+   vector<string> satNames;
+   
 // make sure there is an input file
    if(argc != 2){
-     cout << "Error: enter a file" << endl;
+     cout << "Error: Please input a file" << endl;
      return(1);
    }
    
    ifstream inFile(argv[1]);
-   ofstream outFile("Doppler.txt");
+   ofstream outFile("Doppler.txt"); //needed if want to use getDoppler
    
 // make sure the files opened
    if(!(inFile && outFile)){
@@ -41,8 +46,8 @@ int main (int argc, char * argv[]){
     }
  
    findHeader(inFile);
-   //getDoppler(inFile, outFile);
-   storeDopplar(inFile);
+   storeDopplar(inFile, dopplarData, satNames);
+   writeToFiles(dopplarData, satNames);
    
   
    
@@ -81,7 +86,8 @@ int main (int argc, char * argv[]){
  
 /*****************************************************************************
  * Function: getDopplar - finds the dopplar data in the obs file and prints  *
- *                        the data to a text file                            *
+ *                        the data to a text file (not organized by          *
+ *                        satellite name)                                    *
  * Parameters: ifstream& inFile - the file to find the data for              *
  *             ofstream& outFile - the file to write the dopplar data to     *
  * Return: void                                                              *
@@ -118,20 +124,21 @@ void getDoppler(ifstream& inFile, ofstream& outFile)
  *                         the dopplar data for each satellite is going in a  *
  *                         seperate column with a vector of satellite names in*
  *                         corresponding indexes                              *
+ *                         2D vector dopplarData - the data structure to store*
+ *                         all the dopplar data                               *
  * Parameters - ifstream& inFile - the file with the data                     *
  * Return - void                                                              *
  *****************************************************************************/
-void storeDopplar(ifstream& inFile)
+void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData, 
+     vector<string> & satNames)
 {
 
    int spaceCount = 0;
    string lineHold;
    string satel_Head;
-   unsigned int i, j;
+   unsigned int i;
    vector<double> dopplarHold;
    int satNum;
-   vector<string> SatNames;
-   vector<vector<double>> dopplarData;
    
    while(!inFile.eof())
      { 
@@ -147,25 +154,21 @@ void storeDopplar(ifstream& inFile)
        if(lineHold.length() > 30 && spaceCount < 18)
        {
       // gathers satellite name
-         satel_Head = lineHold.substr(30, lineHold.length() - 1);
+         satel_Head = lineHold.substr(30, lineHold.length() -30);
          if(isspace(satel_Head[0]))
-              satel_Head = satel_Head.substr(1, satel_Head.length()-1);
+             satel_Head[0] = '0';
         
          satNum = stoi(satel_Head.substr(0,2));
-         storeSection(inFile, satel_Head, satNum, SatNames, dopplarData);
+         storeSection(inFile, satel_Head, satNum, satNames, dopplarData);
        }
-      
-   } // closes eof  
-   
- // lets print out the data
-     for(i=0; i < dopplarData.size(); i++)
-     {
-         cout << SatNames.at(i) << endl;
-       for(j = 0; j < dopplarData.at(i).size(); j++)
-       {
-         cout << setprecision(3) << fixed << dopplarData.at(i).at(j) << endl;
-       }
-     }  
+  
+  } // closes while loop
+  
+  for(i = 0; i < satNames.size(); i++)
+  {
+    cout<< satNames.at(i) << endl;
+  }
+     
    
 }
 
@@ -188,20 +191,31 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
 {
     string sat_Name;
     string lineHold;
+    string lineHold2;
     bool isNew = true;
     double dopplar;
     vector<double> dopplarHold;
     unsigned int index = 0;
-
-    for(int i = 0; i < satNum; i++)
+    int i = 0;
+    unsigned int j = 0;
+    int k, kcount = 0;
+ 
+    for(i = 0; i < satNum; i++)
     {
+      kcount = 0;
       index = 0;
       dopplarHold.clear();
       isNew = true;
-      sat_Name = sat_Head.substr(1+(3*i),3);
+      sat_Name = sat_Head.substr(2+(3*i),3);
+      for(j = 0; j < 3; j++)
+      {
+          if(isspace(sat_Name[j]))
+              sat_Name[j] = '0';
+      }
+    
          
    // Check to see if each satellite has been found before or not
-      for(unsigned j = 0; j < satellite_Names.size(); j++)
+      for(j = 0; j < satellite_Names.size(); j++)
       {
           if (sat_Name.compare(satellite_Names.at(j)) == 0)
           {
@@ -210,6 +224,7 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
           }
       }  
       
+      
       if(isNew)
       {
          satellite_Names.push_back(sat_Name);
@@ -217,12 +232,27 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
          getline(dataFile, lineHold); 
          if (lineHold.length() > 15)
          {
-           dopplar = stod(lineHold.substr(30,39));
+           lineHold2 = lineHold.substr(35,13);
+       
+          // check to make sure its not all spaces
+           for(k = 0; k < 13; k++)
+           {
+              if(isspace(lineHold2[k]))
+                  kcount++;
+           }
+           
+           if (kcount < 12) {dopplar = stod(lineHold2); }
+         // the flag for if it wasn't extracted
+           else {dopplar = -1000000.00; }
+          
+           {
+             dopplar = stod(lineHold2);
              if(abs(dopplar) > 15)
              {
                dopplarHold.push_back(dopplar);
                dopplarData.push_back(dopplarHold);
              }
+           }
          }
       }
         
@@ -231,11 +261,59 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
          getline(dataFile, lineHold);
          if (lineHold.length() > 15)
          {
-            dopplar = stod(lineHold.substr(30,39));
-            if(abs(dopplar) > 25)
-                dopplarData.at(index).push_back(dopplar);
+            lineHold2 = lineHold.substr(35,13);
+           // check to make sure its not all spaces
+           for(k = 0; k < 13; k++)
+           {
+              if(isspace(lineHold2[k]))
+                  kcount++;
+           }
+           
+           if (kcount  < 12) {dopplar = stod(lineHold2); }
+           else { dopplar = -1000000.00; }
+            
+           if(abs(dopplar) > 25)
+            {
+              dopplarData.at(index).push_back(dopplar);
+            }
          }
       }
+
+
+    // cout << setprecision(3) << fixed << dopplar << endl;
+
    }
+  
 }
 
+
+/******************************************************************************
+ * function writeToFiles - writes the dopplar data in the 2D array to seperate*
+ *                         text files                                         *
+ * Parameters - vector<vector<double>> dopplarData - the 2D vector with the   *
+ *              dopplar data we have stored                                   *
+ *              vector<string> satNames - a vector with all the found         *
+ *              satellite names                                               *
+ *****************************************************************************/
+ void writeToFiles(vector<vector<double>>& dopplarData, vector<string>&
+        satNames)
+ {
+    std::stringstream ss;
+    for(unsigned i = 0; i < dopplarData.size(); i++)
+    {
+       ss.str(std::string());
+       ss << satNames.at(i) << ".txt";
+       ofstream out(ss.str());
+       for(unsigned int j = 0; j < dopplarData.at(i).size(); j++)
+       {
+          out << setprecision(3) << fixed << dopplarData.at(i).at(j) << endl;
+       } 
+     out.close();
+    }
+ }
+ 
+ 
+ 
+ 
+ 
+      
