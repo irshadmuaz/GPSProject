@@ -19,7 +19,7 @@ int main()
 
 	NavMessage.EphCalc(12, 36, 44.995, rec);
 
-	// for (int i = 0; i < 3; i++)
+	//  for (int i = 0; i < 3; i++)
 		//cout << NavMessage.vecEph.at(i).PRN << "    Doppler:     " << endl;
 
 	cin.get();
