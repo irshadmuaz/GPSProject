@@ -1,5 +1,6 @@
 // Header file for parsing the RINEX 2.10 Navigation file
-#pragma once
+#ifndef RINEX_H
+#define RINEX_H
 
 /* ----- Includes, Usings, and Structs ----- */
 #include <iostream>
@@ -79,7 +80,7 @@ class NavParser
 {
 public:
 	// Parses the data from fileLocation
-	void	ReadData(string fileLocation);
+	void	ReadData(const char *fileLocation);
 	// Calculates data for each satellite at a given time
 	void	EphCalc(short int hr, short int min, float sec, double pos[3]);
 
@@ -105,3 +106,5 @@ private:
 	void	ReadBody();			// Parses the data in the body
 
 };
+
+#endif

@@ -2,10 +2,10 @@
 #include "RinexNav.h"
 
 // Opens the navigation file and calls functions to parse the data
-void NavParser::ReadData(string fileLocation)
+void NavParser::ReadData(const char *fileLocation)
 {
-	inFile.open(fileLocation);
-
+	inFile.open("/home/david/GPSdopplar/Nav/COM4_180405_123531(apr5_binary2).nav");
+   
 	// Return exception if the file isn't opening
 	if (!inFile.is_open())
 		throw "Invalid file input.";
@@ -23,12 +23,12 @@ void NavParser::ReadHeader()
 
 	// Iterate through each line
 	while (getline(inFile, line))
-	{
+	{ 
 		label = line.substr(60);
 
 		if (label == "RINEX VERSION / TYPE")
-		{
-			version = stof(line.substr(0, 9));
+		{ 
+			version = stof(line.substr(0, 9)); 
 			fileType = line[20];
 		}
 		else if (label == "PGM / RUN BY / DATE ")
@@ -41,7 +41,7 @@ void NavParser::ReadHeader()
 		{
 			comments.push_back(line.substr(0, 59));
 		}
-		else if (label == "END OF HEADER       ")
+		else if (label.substr(0, 3) == "END")
 			break;
 	}
 }
@@ -221,4 +221,3 @@ void NavParser::EphCalc(short int hr, short int min, float sec, double pos[3])
 		vecCalc.push_back(calc);
 	}
 }
-
