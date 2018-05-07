@@ -9,3 +9,6 @@ UBXFILE=$1
 OBSFILE=$2
 # .nav file name is the third
 NAVFILE=$3
+
+./convbin -r ubx -o $OBSFILE -n $NAVFILE $UBXFILE
+
