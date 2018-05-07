@@ -12,6 +12,8 @@ using namespace std;
 int main()
 {
 	NavParser NavMessage;
+
+   cout << "Hello" << endl;
 	
 	double rec[3] = {654572, -5210045, 3608339}; 
 
