@@ -50,6 +50,9 @@ void NavParser::ReadBody()
 {
    int i; 
 
+   for (int j = 0; j < 32; j++)
+      satEph[j].PRN = 0;
+
 	while (getline(inFile, line))
 	{
       i = stoi(line.substr(0, 2)) - 1;
@@ -204,7 +207,7 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 224;
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 568.7;
 
    return calc;
 }
@@ -223,7 +226,7 @@ void NavParser::CompDoppler(double pos[3])
    report.open("Report.txt");
 
    // Loop through the sattelites
-   for (int i = 4; i < 32; i++)
+   for (int i = 1; i <= 32; i++)
    {
       fileName.str("");
       obsData.close();
@@ -239,11 +242,12 @@ void NavParser::CompDoppler(double pos[3])
       if (!obsData.is_open())
          continue;
 
-      cout << "Files loaded:" << endl;
+      cout << endl<<  "Files loaded:" << endl;
       cout << fileName.str() << endl;
 
       obsData >> oldDoppler;
       obsData >> timek;
-      cout << EphCalc(i, timek, pos).doppler;
+      if (satEph[i - 1].PRN != 0)
+         cout << EphCalc(i, timek, pos).doppler;
    }
 }

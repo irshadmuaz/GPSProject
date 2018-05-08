@@ -77,10 +77,12 @@ float operator-(const Time& time1, const Time& time2)
  //  int year = time1copy.year() - time2copy.year();
  //  int month = time1copy.month() - time2copy.month();
  //  int day = time1copy.day() - time2copy.day();
-   int hour = time1copy.hour() - time2copy.hour();
-   int minute = time1copy.minute() - time1copy.minute();
+   int hour = time1copy.hour()*3600 - time2copy.hour()*3600;
+   int minute = time1copy.minute()*60 - time2copy.minute()*60;
    float second = time1copy.second() - time2copy.second();
    
-   float newSeconds = second + minute*60 + hour*3600;
+   float newSeconds = hour + minute + second;
    return newSeconds;
 }
+
+
