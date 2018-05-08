@@ -9,24 +9,29 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
-	NavParser NavMessage;
-
-   cout << "Hello" << endl;
+	NavParser NavMsg;
 	
 	double rec[3] = {654572, -5210045, 3608339}; 
 
-	NavMessage.ReadData("/home/david/GPSdopplar/Nav/COM4_180405_123531(apr5_binary2).nav");
-
-	NavMessage.EphCalc(12, 36, 44.995, rec);
-
-	// for (int i = 0; i < 3; i++)
-		//cout << NavMessage.vecEph.at(i).PRN << "    Doppler:     " << endl;
-
-	cin.get();
-	return 1;
-
+   if (argc != 2)
+   {
+      cout << "Error: Must provide a single nav file argument" << endl;
+      return 0;
+   }
    
+   cout << 1 + ".txt" << endl;
+	NavMsg.ReadData(argv[1]);
+
+	NavMsg.EphCalc(13, 1, 56.996, rec);
+
+	for (int i = 0; i < NavMsg.satCount; i++)
+		cout << NavMsg.vecEph.at(i).PRN << " Doppler: " << 
+         NavMsg.vecCalc.at(i).doppler << endl;
+
+   NavMsg.CompDoppler(rec);
+
+	cin.get();   
    return 0;
 }

@@ -1,10 +1,9 @@
-// Function definitions for RinexNav
 #include "RinexNav.h"
 
 // Opens the navigation file and calls functions to parse the data
 void NavParser::ReadData(const char *fileLocation)
 {
-	inFile.open("/home/david/GPSdopplar/Nav/COM4_180405_123531(apr5_binary2).nav");
+	inFile.open(fileLocation);
    
 	// Return exception if the file isn't opening
 	if (!inFile.is_open())
@@ -28,18 +27,18 @@ void NavParser::ReadHeader()
 
 		if (label == "RINEX VERSION / TYPE")
 		{ 
-			version = stof(line.substr(0, 9)); 
-			fileType = line[20];
+			header.version = stof(line.substr(0, 9)); 
+			header.fileType = line[20];
 		}
 		else if (label == "PGM / RUN BY / DATE ")
 		{
-			program = line.substr(0, 20);
-			runBy = line.substr(20, 20);
-			date = line.substr(40, 20);
+			header.program = line.substr(0, 20);
+			header.runBy = line.substr(20, 20);
+			header.date = line.substr(40, 20);
 		}
 		else if (label == "COMMENT             ")
 		{
-			comments.push_back(line.substr(0, 59));
+			header.comments.push_back(line.substr(0, 59));
 		}
 		else if (label.substr(0, 3) == "END")
 			break;
@@ -49,73 +48,72 @@ void NavParser::ReadHeader()
 // Reads the body lines; Should be called after ReadHeader()
 void NavParser::ReadBody()
 {
-	struct EphData satData;
+	struct EphData satEph;
 
 	while (getline(inFile, line))
 	{
 		// PRN / EPOCH / SV CLK
-		satData.PRN =	stoi(line.substr(0, 2));
-		satData.year =	stoi(line.substr(3, 2));
-		satData.month = stoi(line.substr(6, 2));
-		satData.day =	stoi(line.substr(9, 2));
-		satData.hour =	stoi(line.substr(12, 2));
-		satData.minute =	stoi(line.substr(15, 2));
-		satData.second =	stof(line.substr(17, 5));
-		satData.svClkBias = stod(line.substr(22, 19));
-		satData.svClkDrift =		stod(line.substr(41, 19));
-		satData.svClkDriftRate =	stod(line.substr(60, 19));
+		satEph.PRN =	   stoi(line.substr(0, 2));
+		satEph.year =	   stoi(line.substr(3, 2));
+		satEph.month =    stoi(line.substr(6, 2));
+		satEph.day =	   stoi(line.substr(9, 2));
+		satEph.hour =	   stoi(line.substr(12, 2));
+		satEph.minute =	stoi(line.substr(15, 2));
+		satEph.second =	stof(line.substr(17, 5));
+		satEph.svClkBias =  stod(line.substr(22, 19));
+		satEph.svClkDft =   stod(line.substr(41, 19));
+		satEph.svClkDftRt = stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 1
 		getline(inFile, line);
-		satData.IODE =		stod(line.substr(3, 19));
-		satData.crs =		stod(line.substr(22, 19));
-		satData.dn =		stod(line.substr(41, 19)); // 3.14159265358979323846;
-		satData.m0 =		stod(line.substr(60, 19)); // 3.14159265358979323846;
+		satEph.IODE =	stod(line.substr(3, 19));
+		satEph.crs =	stod(line.substr(22, 19));
+		satEph.dn =		stod(line.substr(41, 19));
+		satEph.m0 =		stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 2
 		getline(inFile, line);
-		satData.cuc =			stod(line.substr(3, 19));
-		satData.ecc =			stod(line.substr(22, 19));
-		satData.cus =			stod(line.substr(41, 19));
-		satData.sqrta =			stod(line.substr(60, 19));
+		satEph.cuc =	stod(line.substr(3, 19));
+		satEph.ecc =	stod(line.substr(22, 19));
+		satEph.cus =	stod(line.substr(41, 19));
+		satEph.sqrta =	stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 3
 		getline(inFile, line);
-		satData.t =			stod(line.substr(3, 19));
-		satData.cic =		stod(line.substr(22, 19));
-		satData.omega =		stod(line.substr(41, 19)); // 3.14159265358979323846;
-		satData.cis =		stod(line.substr(60, 19));
+		satEph.t =		stod(line.substr(3, 19));
+		satEph.cic =	stod(line.substr(22, 19));
+		satEph.omega =	stod(line.substr(41, 19));
+		satEph.cis =	stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 4
 		getline(inFile, line);
-		satData.inc =		stod(line.substr(3, 19)); // 3.14159265358979323846;
-		satData.crc =		stod(line.substr(22, 19));
-		satData.w =			stod(line.substr(41, 19)); // 3.14159265358979323846;
-		satData.omegaDot =	stod(line.substr(60, 19)); // 3.14159265358979323846;
+		satEph.inc =		stod(line.substr(3, 19));
+		satEph.crc =		stod(line.substr(22, 19));
+		satEph.w =			stod(line.substr(41, 19));
+		satEph.omegaDot =	stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 5
 		getline(inFile, line);
-		satData.IDOT =			stod(line.substr(3, 19)); // 3.14159265358979323846;
-		satData.channelCodes =	stod(line.substr(22, 19));
-		satData.gpsWeekNum =	stod(line.substr(41, 19));
-		satData.pDataFlag =		stod(line.substr(60, 19));
+		satEph.IDOT =			   stod(line.substr(3, 19));
+		satEph.channelCodes =	stod(line.substr(22, 19));
+		satEph.gpsWeekNum =	   stod(line.substr(41, 19));
+		satEph.pDataFlag =		stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 6
 		getline(inFile, line);
-		satData.svAccuracy =	stod(line.substr(3, 19));
-		satData.svHealth =		stod(line.substr(22, 19));
-		satData.TGD =			stod(line.substr(41, 19));
-		satData.IODC =			stod(line.substr(60, 19));
+		satEph.svAccuracy =	stod(line.substr(3, 19));
+		satEph.svHealth =	   stod(line.substr(22, 19));
+		satEph.TGD =			stod(line.substr(41, 19));
+		satEph.IODC =			stod(line.substr(60, 19));
 
 		// BROADCAST ORBIT - 7
 		getline(inFile, line);
-		satData.timeOfMsg =		stod(line.substr(3, 19));
-		satData.fitInterval =	stod(line.substr(22, 19));
+		satEph.timeOfMsg =	stod(line.substr(3, 19));
+		satEph.fitInterval =	stod(line.substr(22, 19));
 
-		
-		vecEph.push_back(satData);
-		
+		vecEph.push_back(satEph);
 	}
+   satCount = vecEph.size();
 }
 
 void NavParser::EphCalc(short int hr, short int min, float sec, double pos[3])
@@ -123,18 +121,14 @@ void NavParser::EphCalc(short int hr, short int min, float sec, double pos[3])
 	struct CalcData calc;
 	struct EphData eph;
 
-	double temp1;
-	double temp2;
-	double EOld;
-	int	count;
-
-	double relVel;
-	double relPos[3];
-	double doppler;
+	double   temp1;
+	double   temp2;
+	double   EOld;
+	int	   count;
 
 	vecCalc.clear();
 
-	for (int i = 0; i < vecEph.size(); i++)
+	for (int i = 0; i < satCount; i++)
 	{
 		// Set the ephemris data
 		eph = vecEph.at(i);
@@ -209,15 +203,41 @@ void NavParser::EphCalc(short int hr, short int min, float sec, double pos[3])
 
 		// Doppler
 		for (int k = 0; k < 3; k++)
-			relPos[k] = -calc.pos[k] + pos[k];
+			calc.relPos[k] = -calc.pos[k] + pos[k];
 
-		relVel = (relPos[0] * calc.vel[0] + relPos[1] * calc.vel[1] + relPos[2] * calc.vel[2]) /
-			sqrt(relPos[0] * relPos[0] + relPos[1] * relPos[1] + relPos[2] * relPos[2]);
+		calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
+			sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-		doppler = 1.57542e9 * relVel / 299792458.0 - 224;
-
-		cout << eph.PRN << " doppler: " << doppler << endl;
+		calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 224;
 
 		vecCalc.push_back(calc);
 	}
+}
+
+// Print the doppler to their respective 
+void NavParser::CompDoppler(double pos[3])
+{
+   ifstream obsData;
+   stringstream fileName;
+
+   // Loop through the sattelites
+   for (int i = 0; i < 32; i++)
+   {
+      fileName.str("");
+      obsData.close();
+
+      if (i < 10)
+         fileName << "G0" << i << ".txt";
+      else
+         fileName << "G" << i << ".txt";
+
+      cout << fileName.str() << endl;
+
+      obsData.open(fileName.str().c_str());
+
+      if (!obsData.is_open())
+         continue;
+
+      getline()
+   }
 }
