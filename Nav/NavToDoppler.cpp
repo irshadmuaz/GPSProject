@@ -20,18 +20,10 @@ int main(int argc, char *argv[])
       cout << "Error: Must provide a single nav file argument" << endl;
       return 0;
    }
-   
-   cout << 1 + ".txt" << endl;
+
 	NavMsg.ReadData(argv[1]);
 
-	NavMsg.EphCalc(13, 1, 56.996, rec);
-
-	for (int i = 0; i < NavMsg.satCount; i++)
-		cout << NavMsg.vecEph.at(i).PRN << " Doppler: " << 
-         NavMsg.vecCalc.at(i).doppler << endl;
-
    NavMsg.CompDoppler(rec);
-
-	cin.get();   
+   
    return 0;
 }

@@ -9,18 +9,19 @@
 #include <vector>
 #include <math.h>
 #include <sstream>
+#include "Time.h"
 
 #define EARTH_GRAV   3.986008e14
 #define EARTH_ROT    7.292115167e-5
 
 using namespace std;
 
+// Holds the ephemris data as defined in RINEX 2.10
 struct EphData
 {
    // PRN / EPOCH / SV CLK
    short int   PRN;
-   short int   year, month, day, hour, minute;
-   float       second;
+   Time        time;
    double      svClkBias, svClkDft, svClkDftRt;
 
    // BROADCAST ORBIT - 1
@@ -45,6 +46,7 @@ struct EphData
    double   timeOfMsg, fitInterval;
 };
 
+// Holds the header data for RINEX 2.10
 struct HeaderData
 {
    float    version;
@@ -55,10 +57,9 @@ struct HeaderData
    vector <string> comments;
 };
 
+// Holds data that is calculated from the satellite ephemris and reciever data
 struct CalcData 
 {
-   short int   hour, minute;
-   float    second;     // Time of calculated data
    double   pos[3];     // GPS satellite position in ECEF
    double   vel[3];     // GPS satellite velocity in ECEF
    double   a;          // Semimajor axis
@@ -94,8 +95,8 @@ class NavParser
 public:
    // Parses the data from fileLocation
    void ReadData(const char *fileLocation);
-   // Calculates data for each satellite at a given time
-   void EphCalc(short int hr, short int min, float sec, double pos[3]);
+   // Calculates data for each satellite at a given time and returns the calculated values
+   struct CalcData EphCalc(short int prn, Time time, double pos[3]);
    // Prints the doppler for each satellite to text files
    void CompDoppler(double pos[3]);
 
@@ -103,13 +104,7 @@ public:
    struct HeaderData header;
 
    // Body Data
-   vector <struct EphData> vecEph;
-
-   // Calculated Data
-   vector <struct CalcData> vecCalc;
-
-   // Number of satellites
-   int satCount;
+   struct EphData satEph[32];
 
 private:
    ifstream    inFile;     // Holds the navigation file
