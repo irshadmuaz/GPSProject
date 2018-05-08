@@ -67,20 +67,20 @@ std::istream& operator>> (std::istream& file, Time& time)
 } 
 
 // Overload - operator
-Time operator-(const Time& time1, const Time& time2)
+float operator-(const Time& time1, const Time& time2)
 {
    Time time1copy;
    time1copy = time1;
    Time time2copy;
    time2copy = time2;
    
-   int year = time1copy.year() - time2copy.year();
-   int month = time1copy.month() - time2copy.month();
-   int day = time1copy.day() - time2copy.day();
+ //  int year = time1copy.year() - time2copy.year();
+ //  int month = time1copy.month() - time2copy.month();
+ //  int day = time1copy.day() - time2copy.day();
    int hour = time1copy.hour() - time2copy.hour();
    int minute = time1copy.minute() - time1copy.minute();
    float second = time1copy.second() - time2copy.second();
    
-   Time newTime(year,month,day,hour,minute,second);
-   return newTime;
+   float newSeconds = second + minute*60 + hour*3600;
+   return newSeconds;
 }

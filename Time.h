@@ -39,6 +39,6 @@ class Time
      friend std::ostream& operator<< (std::ostream&, const Time&);
      friend std::istream& operator>>(std::istream&, const Time&);
      Time& operator=(const Time&);
-     friend Time operator-(const Time&, const Time&);
+     friend float operator-(const Time&, const Time&);
  
 };
