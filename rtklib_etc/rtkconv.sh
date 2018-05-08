@@ -5,10 +5,10 @@
 
 # .ubx file is the first argument
 UBXFILE=$1
+FILENAME="${UBXFILE%%.ubx}"
 # .obs file name is the second
-OBSFILE=$2
+OBSFILE="$FILENAME.obs"
 # .nav file name is the third
-NAVFILE=$3
+NAVFILE="$FILENAME.nav"
 
-./convbin -r ubx -o $OBSFILE -n $NAVFILE $UBXFILE
-
+./convbin -r ubx -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od $UBXFILE
