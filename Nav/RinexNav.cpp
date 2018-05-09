@@ -207,7 +207,7 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 570;
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 210
 
    return calc;
 }
@@ -221,6 +221,7 @@ void NavParser::createReport(char *reportName, double pos[3])
    Time timeOfData;
    double measDoppler;
    double calcDoppler;
+   double refDoppler; // Accounts for drift errors
 
    stringstream fileName;
    string line;
@@ -228,6 +229,8 @@ void NavParser::createReport(char *reportName, double pos[3])
    report.open(reportName);
 
    report << "PRN | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << endl;
+
+   refDoppler = 0;
 
    // Loop through the sattelites
    for (int i = 1; i <= 32; i++)
@@ -252,7 +255,16 @@ void NavParser::createReport(char *reportName, double pos[3])
       {
          obsData >> measDoppler;
          if (!(obsData >> timeOfData)) break;
+
          calcDoppler = EphCalc(i, timeOfData, pos).doppler;
+
+         // Set drift error on first pass
+         if (refDoppler == 0)
+         {
+            refDoppler = measDoppler - calcDoppler;
+         }
+
+         calcDoppler += refDoppler;
          
          report << setw(3) << i << " ";
          report << setw(10) << measDoppler << " ";

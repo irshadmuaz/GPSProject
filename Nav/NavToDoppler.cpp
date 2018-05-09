@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
 	
 	double rec[3] = {654572, -5210045, 3608339}; 
 
-   // if (argc != 2)
-   // {
-   //    cout << "Error: Must provide a single nav file argument" << endl;
-   //    return 0;
-   // }
+   if (argc != 2)
+   {
+      cout << "Error: Must provide a single nav file argument" << endl;
+      return 0;
+   }
 
-	NavMsg.ReadData("2018-05-08.nav");
+	NavMsg.ReadData(argv[1]);
 
    NavMsg.createReport("Report.txt", rec);
    
