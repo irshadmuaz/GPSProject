@@ -20,13 +20,25 @@ class Time
      Time();
      Time(int, int, int, int, int, float);
      ~Time();
+    // getters
+    
      int& year ();
      int &month();
      int &day();
      int &hour();
      int &minute();
      float &second();
+    // setters
+     void setYear(int);
+     void setMonth(int);
+     void setDay(int);
+     void setHour(int);
+     void setMinute(int);
+     void setSecond(float);
+     
      friend std::ostream& operator<< (std::ostream&, const Time&);
+     friend std::istream& operator>>(std::istream&, const Time&);
      Time& operator=(const Time&);
+     friend float operator-(const Time&, const Time&);
  
 };
