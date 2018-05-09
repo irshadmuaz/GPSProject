@@ -179,8 +179,7 @@ void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData,
           dopplarTime, time_Head);
        }
   
-  } // closes while loop
-       
+  } // closes while loop       
    
 }
 
@@ -217,11 +216,12 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
     unsigned int j = 0;
     int k, kcount = 0;
     Time thisTime;
-    thisTime = storeTime(time_Head);
     vector<Time> timeHold;
+    thisTime = storeTime(time_Head);
  
     for(i = 0; i < satNum; i++)
     {
+      timeHold.clear();
       kcount = 0;
       index = 0;
       dopplarHold.clear();
