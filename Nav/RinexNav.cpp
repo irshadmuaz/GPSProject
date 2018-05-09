@@ -136,7 +136,8 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.a = eph.sqrta * eph.sqrta;
 
    // Time difference
-   calc.dt = time - eph.time;
+   calc.dt = eph.svClkBias + eph.t * (eph.svClkDft + eph.svClkDftRt * eph.t);
+   calc.dt = (time - eph.time);
 
    // Calculate mean motion
    calc.n = sqrt(EARTH_GRAV / (calc.a * calc.a * calc.a)) + eph.dn;
@@ -259,7 +260,7 @@ void NavParser::createReport(char *reportName, double pos[3])
          calcDoppler = EphCalc(i, timeOfData, pos).doppler;
 
          // Set drift error on first pass
-         if (refDoppler == 0)
+         if (refDoppler == 1)
          {
             refDoppler = measDoppler - calcDoppler;
          }

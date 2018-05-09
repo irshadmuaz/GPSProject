@@ -18,10 +18,10 @@ int main(int argc, char *argv[])
    if (argc != 2)
    {
       cout << "Error: Must provide a single nav file argument" << endl;
-      return 0;
+      //return 0;
    }
 
-	NavMsg.ReadData(argv[1]);
+	NavMsg.ReadData("2018-05-08.nav");
 
    NavMsg.createReport("Report.txt", rec);
    
