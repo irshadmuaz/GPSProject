@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
 	NavMsg.ReadData("2018-05-08.nav");
 
-   NavMsg.CompDoppler(rec);
+   NavMsg.createReport("Report.txt", rec);
    
    return 0;
 }

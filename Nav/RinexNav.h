@@ -10,6 +10,7 @@
 #include <math.h>
 #include <sstream>
 #include "Time.h"
+#include <iomanip>
 
 #define EARTH_GRAV   3.986008e14
 #define EARTH_ROT    7.292115167e-5
@@ -98,7 +99,7 @@ public:
    // Calculates data for each satellite at a given time and returns the calculated values
    struct CalcData EphCalc(short int prn, Time time, double pos[3]);
    // Prints the doppler for each satellite to text files
-   void CompDoppler(double pos[3]);
+   void createReport(char *reportName, double pos[3]);
 
    // Header Data
    struct HeaderData header;

@@ -207,23 +207,27 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 568.7;
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0 - 570;
 
    return calc;
 }
 
 // Print the doppler to their respective 
-void NavParser::CompDoppler(double pos[3])
+void NavParser::createReport(char *reportName, double pos[3])
 {
    ifstream obsData;
    ofstream report;
 
-   Time timek;
-   double oldDoppler;
+   Time timeOfData;
+   double measDoppler;
+   double calcDoppler;
 
    stringstream fileName;
+   string line;
 
-   report.open("Report.txt");
+   report.open(reportName);
+
+   report << "PRN | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << endl;
 
    // Loop through the sattelites
    for (int i = 1; i <= 32; i++)
@@ -231,23 +235,34 @@ void NavParser::CompDoppler(double pos[3])
       fileName.str("");
       obsData.close();
 
+      // Create fileName to open
       if (i < 10)
          fileName << "G0" << i << ".txt";
       else
          fileName << "G" << i << ".txt";
       
-
       obsData.open(fileName.str().c_str());
 
-      if (!obsData.is_open())
+      // Ignore if satellite info is missing
+      if (!obsData.is_open() || satEph[i - 1].PRN == 0)
          continue;
 
-      cout << endl<<  "Files loaded:" << endl;
-      cout << fileName.str() << endl;
+      // Iterate through lines
+      while (!obsData.eof())
+      {
+         obsData >> measDoppler;
+         if (!(obsData >> timeOfData)) break;
+         calcDoppler = EphCalc(i, timeOfData, pos).doppler;
+         
+         report << setw(3) << i << " ";
+         report << setw(10) << measDoppler << " ";
+         report << setw(12) << calcDoppler << " ";
+         report << setw(12) << measDoppler - calcDoppler;
+         report << timeOfData << endl;
+      }
 
-      obsData >> oldDoppler;
-      obsData >> timek;
-      if (satEph[i - 1].PRN != 0)
-         cout << EphCalc(i, timek, pos).doppler;
+      
    }
+
+   report.close();
 }
