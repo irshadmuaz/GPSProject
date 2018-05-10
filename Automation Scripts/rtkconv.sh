@@ -11,4 +11,4 @@ OBSFILE="$FILENAME.obs"
 # .nav file name is the third
 NAVFILE="$FILENAME.nav"
 
-./convbin -r ubx -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od $UBXFILE
+./convbin -r ubx -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od -os $UBXFILE
