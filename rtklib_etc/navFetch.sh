@@ -26,6 +26,19 @@ HRAL=$(echo $HRascii | awk '{printf("%c",$1)}')
 URL="ftp://cddis.gsfc.nasa.gov/gnss/data/hourly/$FULLYEAR/$DOY/$HOUR/zeck$DOY$HRAL.$ABRVYEAR"
 URL+="n.Z"
 
-# use wget to save this file to current directory or given directory
+# Pull most recent data from git to RasPi
+git pull
+
+# Download most recent data to git directory
 wget -P pullData/ $URL
 
+# Push new data to git
+git add .
+git commit -m "Added nav data for $ABRVYEAR : $DOY : $HOUR"
+git push
+
+# The following commands will be used to save the GPSdopplarBot git credentials on RasPi
+# git config credential.helper store
+# git push http://example.com/repo.git
+# Username: <type your username>
+# Password: <type your password>
