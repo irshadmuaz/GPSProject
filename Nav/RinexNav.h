@@ -95,11 +95,11 @@ class NavParser
 {
 public:
    // Parses the data from fileLocation
-   void ReadData(const char *fileLocation);
+   void ReadData(string fileLocation);
    // Calculates data for each satellite at a given time and returns the calculated values
    struct CalcData EphCalc(short int prn, Time time, double pos[3]);
    // Prints the doppler for each satellite to text files
-   void createReport(char *reportName, double pos[3]);
+   void createReport(string reportName, double pos[3]);
 
    // Header Data
    struct HeaderData header;

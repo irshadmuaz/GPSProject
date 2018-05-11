@@ -1,9 +1,9 @@
 #include "RinexNav.h"
 
 // Opens the navigation file and calls functions to parse the data
-void NavParser::ReadData(const char *fileLocation)
+void NavParser::ReadData(string fileLocation)
 {
-	inFile.open(fileLocation);
+	inFile.open(fileLocation.c_str());
    
 	// Return exception if the file isn't opening
 	if (!inFile.is_open())
@@ -58,13 +58,15 @@ void NavParser::ReadBody()
       i = stoi(line.substr(0, 2)) - 1;
 
 		// PRN / EPOCH / SV CLK
-		satEph[i].PRN =	      stoi(line.substr(0, 2));
+		satEph[i].PRN = stoi(line.substr(0, 2));
+
 		satEph[i].time.setYear(stoi(line.substr(3, 2)));
 		satEph[i].time.setMonth(stoi(line.substr(6, 2)));
 		satEph[i].time.setDay(stoi(line.substr(9, 2)));
 		satEph[i].time.setHour(stoi(line.substr(12, 2)));
 		satEph[i].time.setMinute(stoi(line.substr(15, 2)));
 		satEph[i].time.setSecond(stof(line.substr(17, 5)));
+
 		satEph[i].svClkBias =   stod(line.substr(22, 19));
 		satEph[i].svClkDft =    stod(line.substr(41, 19));
 		satEph[i].svClkDftRt =  stod(line.substr(60, 19));
@@ -136,7 +138,6 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.a = eph.sqrta * eph.sqrta;
 
    // Time difference
-   calc.dt = eph.svClkBias + eph.t * (eph.svClkDft + eph.svClkDftRt * eph.t);
    calc.dt = (time - eph.time);
 
    // Calculate mean motion
@@ -208,13 +209,13 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 210
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 210 // -570
 
    return calc;
 }
 
 // Print the doppler to their respective 
-void NavParser::createReport(char *reportName, double pos[3])
+void NavParser::createReport(string reportName, double pos[3])
 {
    ifstream obsData;
    ofstream report;
@@ -227,7 +228,7 @@ void NavParser::createReport(char *reportName, double pos[3])
    stringstream fileName;
    string line;
 
-   report.open(reportName);
+   report.open(reportName.c_str());
 
    report << "PRN | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << endl;
 
@@ -237,7 +238,6 @@ void NavParser::createReport(char *reportName, double pos[3])
    for (int i = 1; i <= 32; i++)
    {
       fileName.str("");
-      obsData.close();
 
       // Create fileName to open
       if (i < 10)
@@ -274,7 +274,8 @@ void NavParser::createReport(char *reportName, double pos[3])
          report << timeOfData << endl;
       }
 
-      
+      obsData.close();
+      remove(fileName.str().c_str());
    }
 
    report.close();
