@@ -1,4 +1,6 @@
 #!/bin/bash
 
-./ObsDoppler 2018-05-08.obs
-./NavDoppler 2018-05-08.nav
+./ObsDoppler $1
+./NavDoppler $2
+
+matlab -nodesktop -nosplash -r "run Gapher.m;quit;"
