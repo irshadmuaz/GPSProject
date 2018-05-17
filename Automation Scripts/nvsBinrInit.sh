@@ -20,28 +20,20 @@ sudo binrcmd -v COLDSTART
 # believe this turns on receiver channels
 sudo binrcmd -v RXCHANNELS 1
 
-# set binary operation mode
-sudo binrcmd -v BINROPMODE
-
 # bit information transmitted by satellites
 sudo binrcmd -v BITINF 1
 
 # set navigation operation mode
 # sudo binrcmd -v NAVOPMODE
-# sudo binrcmd -v WAIT 200
 
 # set navgation rate in Hz (1,2,5,10 Hz)
 sudo binrcmd -v NAVRATE 2
 
 # differential correction SBAS w/ RTCA troposphere model
 # sudo binrcmd -v DIFFCOR 2 1
-# sudo binrcmd -v WAIT 1000r
-
-# turn on types of channels (I think)
-sudo binrcmd -v CHANDIST GLON GPS SBAS
 
 # Assisted messages turned on (I think)
-sudo binrcmd -v ASSMSG on
+sudo binrcmd -v ASSMSG 1
 
 # raw data output in intervals of dezi-secs (100ms)
 # 1 -> 10Hz, 2 -> 5Hz, 5 -> 2Hz, 10 -> 1Hz (inverse
