@@ -6,6 +6,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define DISPLAY_STRING
+
 int set_interface_attribs(int fd, int speed)
 {
     struct termios tty;
@@ -80,6 +82,7 @@ int main()
     }
     tcdrain(fd);    /* delay for output */
 
+   FILE *fp = fopen("test.bin", "wb");
 
     /* simple noncanonical input */
     do {
@@ -88,16 +91,7 @@ int main()
 
         rdlen = read(fd, buf, sizeof(buf) - 1);
         if (rdlen > 0) {
-#ifdef DISPLAY_STRING
-            buf[rdlen] = 0;
-            printf("Read %d: \"%s\"\n", rdlen, buf);
-#else /* display hex */
-            unsigned char   *p;
-            printf("Read %d:", rdlen);
-            for (p = buf; rdlen-- > 0; p++)
-                printf(" 0x%x", *p);
-            printf("\n");
-#endif
+            fwrite(buf, sizeof(buf), 1, fp);
         } else if (rdlen < 0) {
             printf("Error from read: %d: %s\n", rdlen, strerror(errno));
         }
