@@ -209,7 +209,7 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 210 // -570
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 400
 
    return calc;
 }
@@ -249,7 +249,10 @@ void NavParser::createReport(string reportName, double pos[3])
 
       // Ignore if satellite info is missing
       if (!obsData.is_open() || satEph[i - 1].PRN == 0)
+      {
+         remove(fileName.str().c_str());
          continue;
+      }
 
       // Iterate through lines
       while (!obsData.eof())

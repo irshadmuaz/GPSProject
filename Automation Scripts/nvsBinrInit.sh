@@ -5,35 +5,61 @@
 # into binary nvs mode on a Raspberry Pi that already has
 # all dependent software and modules installed
 
+# initialize the NVS08C-CSM chipset
 sudo nvsctl -v init
 
+# set nvsmode to binary
 sudo nvsmode -v binr
 
-# reboot without erasing saved parameters
-sudo binrcommand -v WARMSTART
-sudo binrcommand -v WAIT 200
+# clear all binary transmission requests
+sudo binrcmd -v CANTX
+sudo binrcmd -v WAIT 200
+
+# reboot with erasing saved parameters
+sudo binrcmd -v COLDSTART
+sudo binrcmd -v WAIT 200
+
+# believe this turns on receiver channels
+sudo binrcmd -v RXCHANNELS 1
+sudo binrcmd -v WAIT 200
+
+# set binary operation mode
+sudo binrcmd -v BINROPMODE
+sudo binrcmd -v WAIT 200
+
+# bit information transmitted by satellites
+sudo binrcmd -v BITINF 1
+sudo binrcmd -v WAIT 200
+
+# set navigation operation mode
+# sudo binrcmd -v NAVOPMODE
+# sudo binrcmd -v WAIT 200
 
 # set navgation rate in Hz (1,2,5,10 Hz)
-sudo binrcommand -v NAVRATE 2
-sudo binrcommand -v WAIT 200
+sudo binrcmd -v NAVRATE 2
+sudo binrcmd -v WAIT 200
 
 # differential correction SBAS w/ RTCA troposphere model
-sudo binrcommand -v DIFFCOR 2 1
-sudo binrcommand -v WAIT 1000
+# sudo binrcmd -v DIFFCOR 2 1
+# sudo binrcmd -v WAIT 1000r
+
+# turn on types of channels (I think)
+sudo binrcmd -v CHANDIST GLON GPS SBAS
+sudo binrcmd -v WAIT 200
+
+# Assisted messages turned on (I think)
+sudo binrcmd -v ASSMSG on
+sudo binrcmd -v WAIT 200
 
 # raw data output in intervals of dezi-secs (100ms)
 # 1 -> 10Hz, 2 -> 5Hz, 5 -> 2Hz, 10 -> 1Hz (inverse
 # setting but must be the same or greater than NAVRATE !!)
-sudo binrcommand -v RAWDATA 5
-sudo binrcommand -v WAIT 200
-
-# bit information transmitted by satellites
-sudo binrcommand -v BITINF 1
-sudo binrcommand -v WAIT 200
+sudo binrcmd -v RAWDATA 5
+sudo binrcmd -v WAIT 200
 
 # reboot without erasing saved parameters
-sudo binrcommand -v WARMSTART
-sudo binrcommand -v WAIT 200
+sudo binrcmd -v WARMSTART
+sudo binrcmd -v WAIT 200
 
 # After this just use the following to write the stream to an nvs file
 # cat /dev/ttyAMA0 > binrfile.nvs
