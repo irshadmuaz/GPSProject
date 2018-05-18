@@ -11,9 +11,6 @@ sudo nvsctl -v init
 # set nvsmode to binary
 sudo nvsmode -v binr
 
-# clear all binary transmission requests
-sudo binrcmd -v CANTX
-
 # reboot with erasing saved parameters
 sudo binrcmd -v COLDSTART
 
@@ -21,7 +18,7 @@ sudo binrcmd -v COLDSTART
 # sudo binrcmd -v RXCHANNELS 1
 
 # bit information transmitted by satellites
-sudo binrcmd -v BITINF 1
+# sudo binrcmd -v BITINF 1
 
 # set navgation rate in Hz (1,2,5,10 Hz)
 sudo binrcmd -v NAVRATE 2
