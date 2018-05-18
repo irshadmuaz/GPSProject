@@ -23,14 +23,11 @@ sudo binrcmd -v RXCHANNELS 1
 # bit information transmitted by satellites
 sudo binrcmd -v BITINF 1
 
-# set navigation operation mode
-# sudo binrcmd -v NAVOPMODE
-
 # set navgation rate in Hz (1,2,5,10 Hz)
 sudo binrcmd -v NAVRATE 2
 
 # differential correction SBAS w/ RTCA troposphere model
-# sudo binrcmd -v DIFFCOR 2 1
+sudo binrcmd -v DIFFCOR 2 1
 
 # Assisted messages turned on (I think)
 sudo binrcmd -v ASSMSG 1
