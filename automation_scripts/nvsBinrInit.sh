@@ -18,7 +18,7 @@ sudo binrcmd -v CANTX
 sudo binrcmd -v COLDSTART
 
 # believe this turns on receiver channels
-sudo binrcmd -v RXCHANNELS 1
+# sudo binrcmd -v RXCHANNELS 1
 
 # bit information transmitted by satellites
 sudo binrcmd -v BITINF 1
@@ -30,7 +30,7 @@ sudo binrcmd -v NAVRATE 2
 sudo binrcmd -v DIFFCOR 2 1
 
 # Assisted messages turned on (I think)
-sudo binrcmd -v ASSMSG 1
+# sudo binrcmd -v ASSMSG 1
 
 # raw data output in intervals of dezi-secs (100ms)
 # 1 -> 10Hz, 2 -> 5Hz, 5 -> 2Hz, 10 -> 1Hz (inverse
