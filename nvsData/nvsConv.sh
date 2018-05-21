@@ -1,4 +1,6 @@
 #!/bin/bash
+# nvsConv.sh
+# Finalized on 5/18/18
 # Christopher Brant
 # This bash script is used to automate
 # the conversion of files from .nvs to .obs and .nav

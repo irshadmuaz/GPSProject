@@ -1,4 +1,6 @@
 #!/bin/bash
+# navFetch.sh
+# Finalized on 5/18/18
 # Christopher Brant
 # This script automatically downloads the file at the following url
 # ftp://cddis.gsfc.nasa.gov/gnss/data/hourly/{YYYY}/{DOY}/{HR}/zeck{DOY}{&}.{YY}n.Z

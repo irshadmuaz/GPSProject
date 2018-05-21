@@ -1,4 +1,6 @@
 #!/bin/bash
+# ubxConv.sh
+# Finalized on 5/10/18
 # Christopher Brant
 # This bash script is used to automate
 # the conversion of files from .ubx to .obs and .nav
