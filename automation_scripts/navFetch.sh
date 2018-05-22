@@ -15,7 +15,7 @@ DOY=$(date -u +%j)
 
 # HOUR is the UTC hour of the day in 24 hour time
 HOUR=$(date -u +%H)
-HOUR=$(($HOUR-1))
+HOUR=$(($HOUR-3))
 
 # The following lines are used to convert the hour to a letter value
 CharValue="a"
