@@ -15,6 +15,9 @@ sudo nvsmode -v binr
 # reboot with erasing saved parameters
 sudo binrcmd -v COLDSTART
 
+# select satellite systems (1 for GPS, 2 for GLONASS, defaults as both)
+sudo binrcmd -v SELGNSS 1
+
 # bit information transmitted by satellites
 sudo binrcmd -v BITINF 1
 
@@ -24,8 +27,8 @@ sudo binrcmd -v NAVRATE 2
 # differential correction SBAS w/ RTCA troposphere model
 sudo binrcmd -v DIFFCOR 2 1
 
-# request pvt vector data at rate of 5 ?
-sudo binrcmd -v PVT 5
+# request pvt vector data at rate of 2 Hz
+sudo binrcmd -v PVT 2
 
 # raw data output in intervals of dezi-secs (100ms)
 # 1 -> 10Hz, 2 -> 5Hz, 5 -> 2Hz, 10 -> 1Hz (inverse
