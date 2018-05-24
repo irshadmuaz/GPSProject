@@ -51,6 +51,10 @@ gzip -d -c $FILENAME > $FILEOUT
 cd ..
 cd ..
 
+# add with git
+sudo git add .
+sudo git commit -m "new nav data"
+
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
 # git push http://example.com/repo.git
