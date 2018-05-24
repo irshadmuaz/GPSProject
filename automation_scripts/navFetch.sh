@@ -35,9 +35,9 @@ git pull
 wget -P pullData/ $URL
 
 # Push new data to git
-git add .
-git commit -m "Added nav data for $ABRVYEAR : $DOY : $HOUR"
-git push
+# git add .
+# git commit -m "Added nav data for $ABRVYEAR : $DOY : $HOUR"
+# git push
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
