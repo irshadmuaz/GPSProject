@@ -47,9 +47,6 @@ cd pullData/$SVDIR
 # unzip file
 gzip -d -c $FILENAME > $FILEOUT
 
-# move to GPSdopplar home directory
-cd /home/cbrant/GPSdopplar
-
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
 # git push http://example.com/repo.git
