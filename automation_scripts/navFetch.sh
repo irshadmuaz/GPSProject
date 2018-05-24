@@ -28,12 +28,15 @@ HRAL=$(echo $HRascii | awk '{printf("%c",$1)}')
 URL="ftp://cddis.gsfc.nasa.gov/gnss/data/hourly/$FULLYEAR/$DOY/$HOUR/zeck$DOY$HRAL.$ABRVYEAR"
 URL+="n.Z"
 
+# SVDIR is the directory that the pull data will save to
+SVDIR=$FULLYEAR"_"$DOY
+
 # Enable git settings
 git config --global user.name "GPSdopplarBot"
 git config --global user.email "gpsdopplar@gmail.com"
 
 # Download most recent data to git directory
-wget -P pullData/$ABRVYEAR_$DOY $URL
+wget -P pullData/$SVDIR $URL
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
