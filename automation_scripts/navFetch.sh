@@ -34,11 +34,14 @@ FILENAME="zeck$DOY$HRAL.$ABRVYEAR"
 FILEOUT=$FILENAME"n"
 FILENAME+="n.Z"
 
+# move to GPSdopplar directory
+cd /home/cbrant/GPSdopplar
+
 # Download most recent data to git directory
-wget -P /home/cbrant/GPSdopplar/pullData/$SVDIR $URL
+wget -P pullData/$SVDIR $URL
 
 # move into pullData directory
-cd /home/cbrant/GPSdopplar/pullData/$SVDIR
+cd pullData/$SVDIR
 
 # Enable git settings
 git config --global user.name "GPSdopplarBot"
