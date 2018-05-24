@@ -29,7 +29,7 @@ URL="ftp://cddis.gsfc.nasa.gov/gnss/data/hourly/$FULLYEAR/$DOY/$HOUR/zeck$DOY$HR
 URL+="n.Z"
 
 # Pull most recent data from git to RasPi
-git pull
+# git pull
 
 # Download most recent data to git directory
 #wget -P pullData/ $URL
