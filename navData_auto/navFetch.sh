@@ -33,7 +33,7 @@ git config --global user.name "GPSdopplarBot"
 git config --global user.email "gpsdopplar@gmail.com"
 
 # Download most recent data to git directory
-wget -P pullData/$DOY $URL
+wget -P pullData/$ABRVYEAR_$DOY $URL
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
