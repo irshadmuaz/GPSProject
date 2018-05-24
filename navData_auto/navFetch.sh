@@ -32,7 +32,7 @@ URL+="n.Z"
 # git pull
 
 # Download most recent data to git directory
-wget -P pullData/ $URL
+wget -P pullData/$DOY $URL
 
 # Push new data to git
 # git add .
