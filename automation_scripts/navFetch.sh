@@ -39,7 +39,7 @@ git config --global user.name "GPSdopplarBot"
 git config --global user.email "gpsdopplar@gmail.com"
 
 # Download most recent data to git directory
-wget -P pullData/$SVDIR $URL
+wget -4 -P pullData/$SVDIR $URL
 
 # move into pullData directory
 cd pullData/$SVDIR
