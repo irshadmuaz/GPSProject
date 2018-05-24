@@ -34,18 +34,29 @@ FILENAME="zeck$DOY$HRAL.$ABRVYEAR"
 FILEOUT=$FILENAME"n"
 FILENAME+="n.Z"
 
+# Download most recent data to git directory
+wget -P /home/cbrant/GPSdopplar/pullData/$SVDIR $URL
+
+# move into pullData directory
+cd /home/cbrant/GPSdopplar/pullData/$SVDIR
+
 # Enable git settings
 git config --global user.name "GPSdopplarBot"
 git config --global user.email "gpsdopplar@gmail.com"
 
-# Download most recent data to git directory
-wget -P pullData/$SVDIR $URL
-
-# move into pullData directory
-cd pullData/$SVDIR
+# pull updates
+git pull
 
 # unzip file
 gzip -d -c $FILENAME > $FILEOUT
+
+# move to GPSdopplar home directory
+cd /home/cbrant/GPSdopplar
+
+# add and commit new 
+git add .
+git commit -m "$FULLYEAR $DOY $HOUR navigation file uploaded to git"
+git push
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
