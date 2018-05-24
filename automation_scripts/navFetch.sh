@@ -31,6 +31,7 @@ URL+="n.Z"
 # SVDIR is the directory that the pull data will save to
 SVDIR=$FULLYEAR"_"$DOY
 FILENAME="zeck$DOY$HRAL.$ABRVYEAR"
+FILEOUT=$FILENAME"n"
 FILENAME+="n.Z"
 
 # Enable git settings
@@ -44,7 +45,7 @@ wget -P pullData/$SVDIR $URL
 cd pullData/$SVDIR
 
 # unzip file
-uncompress $FILENAME
+gzip -d -c $FILENAME > $FILEOUT
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
