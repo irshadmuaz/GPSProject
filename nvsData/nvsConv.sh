@@ -19,3 +19,5 @@ NAVFILE="$FILENAME.nav"
 sed '/^[ \t]*$/d' $OBSFILE > temp.obs
 
 cat temp.obs > $OBSFILE
+
+rm temp.obs
