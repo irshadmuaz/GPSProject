@@ -14,6 +14,6 @@ OBSFILE="$FILENAME.obs"
 # .nav file name is the third
 NAVFILE="$FILENAME.nav"
 
-./convbin_mac -r nvs -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od -os $NVSFILE
+./convbin -r nvs -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od -os $NVSFILE
 
 sed '/^[ \t]*$/d' $OBSFILE > $OBSFILE
