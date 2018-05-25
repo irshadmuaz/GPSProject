@@ -16,4 +16,6 @@ NAVFILE="$FILENAME.nav"
 
 ./convbin -r nvs -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od -os $NVSFILE
 
-sed '/^[ \t]*$/d' $OBSFILE > $OBSFILE
+sed '/^[ \t]*$/d' $OBSFILE > temp.obs
+
+cat temp.obs > $OBSFILE
