@@ -13,11 +13,13 @@ FILENAME="${NVSFILE%%.nvs}"
 OBSFILE="$FILENAME.obs"
 # .nav file name is the third
 NAVFILE="$FILENAME.nav"
+# name of current day's data directory
+DAYDIR="$(date -u +%F)-data"
 
-~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d . -v 2.10 -od -os $NVSFILE
+~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d ~/GPSdopplar/nvsData/$DAYDIR -v 2.10 -od -os $NVSFILE
 
-sed '/^[ \t]*$/d' $OBSFILE > temp.obs
+sed '/^[ \t]*$/d' ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE > ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
 
-cat temp.obs > $OBSFILE
+cat ~/GPSdopplar/nvsData/$DAYDIR/temp.obs > ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE
 
-rm temp.obs
+rm ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
