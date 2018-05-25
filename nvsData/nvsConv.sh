@@ -16,7 +16,7 @@ NAVFILE="$FILENAME.nav"
 # name of current day's data directory
 DAYDIR="$(date -u +%F)-data"
 
-~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d ~/GPSdopplar/nvsData/$DAYDIR -v 2.10 -od -os $NVSFILE
+~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d ~/GPSdopplar/nvsData/$DAYDIR -v 2.10 -od -os ~/GPSdopplar/nvsData/$DAYDIR/$NVSFILE
 
 # the next 3 commands ensure there are no white space lines in .obs file
 sed '/^[ \t]*$/d' ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE > ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
