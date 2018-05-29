@@ -1,6 +1,6 @@
 #!/bin/bash
 # nvsBinrInit.sh
-# Finalized on 5/18/18
+# Finalized on 5/26/18
 # Christopher Brant
 # This script automates initialization of the RasPiGNSS module
 # into binary nvs mode on a Raspberry Pi that already has

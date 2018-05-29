@@ -1,14 +1,12 @@
 #!/bin/bash
-# nvsConv.sh
-# Finalized on 5/26/18
+# nvsCollectData.sh
+# Finalized on 5/30/18
 # Christopher Brant
-# This bash script is used to automate
-# the conversion of files from .nvs to .obs and .nav
-# and remove possible whitespace lines in the .obs file
 
 # todays date and time in UTC time
 TODAY="$(date -u +%F)"
-TIME=
+HOUR="$(date -u +%H)"
+MINUTE="$(date -u +%M)"
 
 # .nvs file is the first argument
 NVSFILE=$1
