@@ -1,6 +1,6 @@
 #!/bin/bash
 # nvsConv.sh
-# Finalized on 5/26/18
+# Finalized on 5/29/18
 # Christopher Brant
 # This bash script is used to automate
 # the conversion of files from .nvs to .obs and .nav
@@ -8,7 +8,6 @@
 
 # todays date and time in UTC time
 TODAY="$(date -u +%F)"
-TIME=
 
 # .nvs file is the first argument
 NVSFILE=$1
@@ -17,14 +16,16 @@ FILENAME="${NVSFILE%%.nvs}"
 OBSFILE="$FILENAME.obs"
 # .nav file name is the third
 NAVFILE="$FILENAME.nav"
+# name of the jenkins directory
+CURDIR=$(pwd)
 # name of current day's data directory
 DAYDIR="${TODAY}-data"
 
-~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d ~/GPSdopplar/nvsData/$DAYDIR -v 2.10 -od -os ~/GPSdopplar/nvsData/$DAYDIR/$NVSFILE
+$CURDIR/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d $CURDIR/nvsData/$DAYDIR -v 2.10 -od -os $CURDIR/nvsData/$DAYDIR/$NVSFILE
 
 # the next 3 commands ensure there are no white space lines in .obs file
-sed '/^[ \t]*$/d' ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE > ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
+sed '/^[ \t]*$/d' $CURDIR/nvsData/$DAYDIR/$OBSFILE > $CURDIR/nvsData/$DAYDIR/temp.obs
 
-cat ~/GPSdopplar/nvsData/$DAYDIR/temp.obs > ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE
+cat $CURDIR/nvsData/$DAYDIR/temp.obs > $CURDIR/nvsData/$DAYDIR/$OBSFILE
 
-rm ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
+rm $CURDIR/nvsData/$DAYDIR/temp.obs

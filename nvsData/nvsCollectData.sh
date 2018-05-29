@@ -8,21 +8,29 @@ TODAY="$(date -u +%F)"
 HOUR="$(date -u +%H)"
 MINUTE="$(date -u +%M)"
 
+# create the filename for the nvs file
+FILENAME="$TODAY-$HOUR$MINUTE"
 # .nvs file is the first argument
-NVSFILE=$1
-FILENAME="${NVSFILE%%.nvs}"
+NVSFILE="$FILENAME.nvs"
 # .obs file name is the second
 OBSFILE="$FILENAME.obs"
 # .nav file name is the third
 NAVFILE="$FILENAME.nav"
+# name of the jenkins directory
+CURDIR=$(pwd)
 # name of current day's data directory
 DAYDIR="${TODAY}-data"
 
-~/GPSdopplar/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d ~/GPSdopplar/nvsData/$DAYDIR -v 2.10 -od -os ~/GPSdopplar/nvsData/$DAYDIR/$NVSFILE
+
+
+
+
+
+$CURDIR/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d $CURDIR/nvsData/$DAYDIR -v 2.10 -od -os $CURDIR/nvsData/$DAYDIR/$NVSFILE
 
 # the next 3 commands ensure there are no white space lines in .obs file
-sed '/^[ \t]*$/d' ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE > ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
+sed '/^[ \t]*$/d' $CURDIR/nvsData/$DAYDIR/$OBSFILE > $CURDIR/nvsData/$DAYDIR/temp.obs
 
-cat ~/GPSdopplar/nvsData/$DAYDIR/temp.obs > ~/GPSdopplar/nvsData/$DAYDIR/$OBSFILE
+cat $CURDIR/nvsData/$DAYDIR/temp.obs > $CURDIR/nvsData/$DAYDIR/$OBSFILE
 
-rm ~/GPSdopplar/nvsData/$DAYDIR/temp.obs
+rm $CURDIR/nvsData/$DAYDIR/temp.obs
