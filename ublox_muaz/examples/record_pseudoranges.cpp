@@ -25,7 +25,7 @@ bool StartDataLogging(std::string filename) {
         // write header
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
-        doppler_file_ << "%%Doppler  1) GPS Time(ms) 2) SVID  3) Measured Doppler (m)  4) SVID  5) Calculated Doppler 6) Differential ..." << std::endl;
+        doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
     } catch (std::exception &e) {
         std::cout << "Error opening log file: " << e.what();
         if (data_file_.is_open())
@@ -65,13 +65,25 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
             if(myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid))
             {
                 int svid = (unsigned int)raw_meas.rawmeasreap[ii].svid;
+
                 double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
-                doppler_file_ << fixed << " DOPPLER" << "\t" << (double)raw_meas.iTow;
-                doppler_file_  << "\t" << svid << "\t" << setprecision(3) << measDoppler<<  "\t" 
-                << setprecision(3) << calcDoppler<<"\t"<<measDoppler - myPos.dopplers[svid]<<"\t"<<calcDoppler - myPos.calcDopplers[svid]<<endl; // m
+               
+               // Begin new format
+                doppler_file_ << setw(3) << svid << " ";
+                doppler_file_ << setw(3) << raw_meas.rawmeasreap[ii].cno << " ";
+                doppler_file_ << setw(10) << measDoppler << " ";
+                doppler_file_ << setw(12) << calcDoppler << " ";
+                doppler_file_ << setw(12) << measDoppler - calcDoppler << " ";
+                doppler_file_ << "0 0 0 0 0 " << raw_meas.iTow << endl;
+
+                //doppler_file_  << "\t" << svid << "\t" << setprecision(3) << measDoppler<<  "\t" 
+                //<< setprecision(3) << calcDoppler<<"\t"<<measDoppler - myPos.dopplers[svid]<<"\t"<<calcDoppler - myPos.calcDopplers[svid]<<endl; // m
+               
+               // End new format
                 cout<<"calc: "<<calcDoppler<<"\tmeasured: "<<measDoppler
                 <<"\tError"<<calcDoppler - measDoppler<<"\tDifferential "<< measDoppler - myPos.dopplers[svid]<<endl;
+
                 myPos.dopplers[svid] = measDoppler;
                 myPos.calcDopplers[svid] = calcDoppler;
             }
@@ -82,7 +94,6 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
             //cout<<myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid)<<endl;
         }
         data_file_ << std::endl;
-        doppler_file_<<std::endl;
         data_file_ << fixed << "CNO" << "\t" << (signed long)raw_meas.iTow;
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
