@@ -25,10 +25,10 @@ DAYDIR="${TODAY}-data"
 mkdir -p $CURDIR/nvsData/$DAYDIR
 
 # edit the timeout value to 20m when fully working
-timeout 5m cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
+timeout 2m cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
 
-# sleep for 30s to ensure the file has correctly been written fully
-sleep 30s
+# sleep for 15s to ensure the file has correctly been written fully
+sleep 15s
 
 # convert the nvs binary file and save the .obs and .nav files to the correct location
 $CURDIR/nvsData/convbin -r nvs -o $OBSFILE -n $NAVFILE -d $CURDIR/nvsData/$DAYDIR -v 2.10 -od -os $CURDIR/nvsData/$DAYDIR/$NVSFILE
