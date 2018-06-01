@@ -3,7 +3,9 @@
  * Find the doppler data in a rinex obs file and print to a text file
  * The doppler data is a frequency given in hertz
  *
+ * Compatible with RINEX v 2.10
  * Compiled using C++11
+ *
  */
 
 #include <iostream>
@@ -20,13 +22,13 @@
 using namespace std;
 
 void findHeader(ifstream&);
-void getDoppler(ifstream&, ofstream&);
 void storeDopplar(ifstream&, vector<vector<double>> &, vector<string> &, 
-     vector<vector<Time>> &);
+     vector<vector<Time>> &, vector<vector<double>> &);
 void storeSection(ifstream&, string, int, vector<string>&, 
-     vector<vector<double>>&, vector<vector<Time>> &, string);
+     vector<vector<double>>&, vector<vector<Time>> &, string, 
+     vector<vector<double>> &);
 void writeToFiles(vector<vector<double>> &, vector<string> &, 
-     vector<vector<Time>> &);
+     vector<vector<Time>> &, vector<vector<double>> &);
 Time storeTime(string);
 
 
@@ -35,31 +37,30 @@ int main (int argc, char * argv[])
    vector<vector<double>> dopplarData;
    vector<string> satNames;
    vector<vector<Time>> dopplarTime;
+   vector<vector<double>> CNdata;
    
 // make sure there is an input file
-   if(argc != 2){
+   if(argc != 2)
+   {
      cout << "Error: Please input a file" << endl;
      return(1);
    }
    
    ifstream inFile(argv[1]);
-   ofstream outFile("Doppler.txt"); //needed if want to use getDoppler
    
 // make sure the files opened
-   if(!(inFile && outFile)){
+   if(!(inFile))
+    {
       cout << "Error: Could not open files" << endl;
       return(1);
     }
  
    findHeader(inFile);
-   storeDopplar(inFile, dopplarData, satNames, dopplarTime);
-   writeToFiles(dopplarData, satNames, dopplarTime);
-   
-  
+   storeDopplar(inFile, dopplarData, satNames, dopplarTime, CNdata);
+   writeToFiles(dopplarData, satNames, dopplarTime, CNdata);
    
 // close the files
    inFile.close();
-   outFile.close();
    
    return 0;
 }
@@ -83,45 +84,10 @@ int main (int argc, char * argv[])
        i++;
        file.seekg(i, file.beg);
     }
+
 // position file to point to end of header
     file.seekg(i+12, file.beg);
-    
- }
- 
- 
- 
-/*****************************************************************************
- * Function: getDopplar - finds the dopplar data in the obs file and prints  *
- *                        the data to a text file (not organized by          *
- *                        satellite name)                                    *
- * Parameters: ifstream& inFile - the file to find the data for              *
- *             ofstream& outFile - the file to write the dopplar data to     *
- * Return: void                                                              *
- *****************************************************************************/
-void getDoppler(ifstream& inFile, ofstream& outFile)
-{    
-// the dopplar frequency should never go above 10,000 Hz
-     double dopplar = 0;
-     string lineHold;
-     unsigned int i = 0;
-     int spaceCount = 0;
- 
-     while(!inFile.eof()){
-       getline(inFile, lineHold);
-       spaceCount = 0;
-       for(i = 0; i < lineHold.length(); i++){
-          if(isspace(lineHold[i]))
-                spaceCount++;
-       }
-        
-        if (lineHold.length() > 15){
-           dopplar = stod(lineHold.substr(30,39));
-           if(abs(dopplar) > 25)
-              outFile << setprecision(3) << fixed << dopplar << endl;
-          }
-         
-     }
-    
+    string c;
  }
  
  
@@ -130,7 +96,7 @@ void getDoppler(ifstream& inFile, ofstream& outFile)
  *                         the dopplar data for each satellite is going in a  *
  *                         seperate column with a vector of satellite names   *
  *                         in corresponding indexes. Time will be saved the   *
- *                         same way as the dopplar.                           *          
+ *                         same way as the dopplar.                           *   
  * Parameters - ifstream& inFile - the file with the data                     *
  *              2D vector dopplarData - the 2D vector which will hold the     *
  *              dopplar data.                                                 *
@@ -139,10 +105,13 @@ void getDoppler(ifstream& inFile, ofstream& outFile)
  *              2D vector dopplarTime - the 2D vector which will store the    *
  *              time data, each column representing data for a specific       *
  *              satellite                                                     *
+ *              2D vector CNdata - the 2D vector with the CNo data, each      *
+ *              column for a specific satellite                               *
  * Return - void                                                              *
  *****************************************************************************/
 void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData, 
-     vector<string> & satNames, vector<vector<Time>> & dopplarTime)
+     vector<string> & satNames, vector<vector<Time>> & dopplarTime, 
+     vector<vector<double>>& CNdata)
 {
    int spaceCount = 0;
    string lineHold;
@@ -154,29 +123,23 @@ void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData,
    
    while(!inFile.eof())
      { 
-       getline(inFile, lineHold);
-       spaceCount = 0;
-       for(i = 0; i < lineHold.length(); i++)
-       {
-          if(isspace(lineHold[i]))
-                spaceCount++;
-       }
-     
-    // conditions signify this is not a data line
-       if(lineHold.length() > 30 && spaceCount < 18)
-       {
+       getline(inFile, lineHold); 
+
+ // simple constraint to ensure this line is significant (line header or data)
+       if(lineHold.length() > 30)
+       {  
       // gathers list of satellite names and time into strings
          satel_Head = lineHold.substr(30, lineHold.length() -30);
          time_Head = lineHold.substr(0, 30);
      
-         if(isspace(satel_Head[0]))
-             satel_Head[0] = '0'; 
+         if(isspace(satel_Head[0])) {satel_Head[0] = '0';}
+ 
          satNum = stoi(satel_Head.substr(0,2));
          
       // Stores the section into the 2D vector. A section is the data
       // between data readings (between satellite headers)
          storeSection(inFile, satel_Head, satNum, satNames, dopplarData,
-          dopplarTime, time_Head);
+           dopplarTime, time_Head, CNdata);
        }
   
   } // closes while loop       
@@ -199,18 +162,24 @@ void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData,
  *              data to                                                       *
  *              string time_Head - a string reading of the time, found in the *
  *              header for the section                                        *
+ *              2D vector CNdata - the 2D vector with the CNo data, each      *
+ *              column for a specific satellite                               *
  * Return - void                                                              *
  *****************************************************************************/
 void storeSection(ifstream& dataFile, string sat_Head, int satNum,
      vector<string> & satellite_Names, vector<vector<double>> & dopplarData,
-     vector<vector<Time>> & dopplarTime, string time_Head)
+     vector<vector<Time>> & dopplarTime, string time_Head, vector<
+     vector<double>>& CNdata)
 {
     string sat_Name;
     string lineHold;
     string lineHold2;
+    string lineHold3;
     bool isNew = true;
     double dopplar;
+    double CN;
     vector<double> dopplarHold;
+    vector<double> CNHold;
     unsigned int index = 0;
     int i = 0;
     unsigned int j = 0;
@@ -225,6 +194,7 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
       kcount = 0;
       index = 0;
       dopplarHold.clear();
+      CNHold.clear();
       isNew = true;
       sat_Name = sat_Head.substr(2+(3*i),3);
       for(j = 0; j < 3; j++)
@@ -255,7 +225,7 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
          if (lineHold.length() > 15)
          {
            lineHold2 = lineHold.substr(35,13);
-       
+           lineHold3 = lineHold.substr(55, 10);
           // check to make sure its not all spaces
            for(k = 0; k < 13; k++)
            {
@@ -263,20 +233,24 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
                   kcount++;
            }
            
-           if (kcount < 12) {dopplar = stod(lineHold2); }
-         // the flag for if the dopwasn't extracted
+           if (kcount < 12) {  dopplar = stod(lineHold2); }
+
+         // the flag for if the dop wasn't extracted
            else {dopplar = -1000000.00; }
           
+        // test case to ensure the extraced dopplar is legitimate
+           if(abs(dopplar) > 15)
            {
-             dopplar = stod(lineHold2);
-             if(abs(dopplar) > 15)
-             {
-               dopplarHold.push_back(dopplar);
-               dopplarData.push_back(dopplarHold);
-             }
+             CN = stod(lineHold3);
+             CNHold.push_back(CN);
+             CNdata.push_back(CNHold);
+             dopplarHold.push_back(dopplar);
+             dopplarData.push_back(dopplarHold);
            }
-         }
-      }
+           
+         } // closes if (lineHold.length() > 15)
+
+      } // closes if (isNew)
         
       else
       {
@@ -285,6 +259,7 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
          if (lineHold.length() > 15)
          {
             lineHold2 = lineHold.substr(35,13);
+            lineHold3 = lineHold.substr(55,10);
            // check to make sure its not all spaces
            for(k = 0; k < 13; k++)
            {
@@ -293,19 +268,21 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
            }
            
            if (kcount  < 12) {dopplar = stod(lineHold2); }
+
            else { dopplar = -1000000.00; }
             
            if(abs(dopplar) > 25)
             {
+              CN = stod(lineHold3);
               dopplarData.at(index).push_back(dopplar);
+              CNdata.at(index).push_back(CN);
             }
-         }
-      }
 
+         } // closes if (lineHold.length() > 15)
 
-    // cout << setprecision(3) << fixed << dopplar << endl;
-
-   }
+      } // closes else to if (isNew)
+ 
+   } // closes for i < satNum
   
 }
 
@@ -321,7 +298,8 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
  * Return: void                                                               *
  *****************************************************************************/
  void writeToFiles(vector<vector<double>>& dopplarData, vector<string>&
-        satNames, vector<vector<Time>> & dopplarTime)
+        satNames, vector<vector<Time>> & dopplarTime, 
+        vector<vector<double>> & CNdata)
  {
     std::stringstream ss;
  
@@ -333,6 +311,8 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
        for(unsigned int j = 0; j < dopplarData.at(i).size(); j++)
        {
          out << setprecision(3) << fixed << setw(9)<< dopplarData.at(i).at(j);
+         out << "     ";
+         out << CNdata.at(i).at(j);
          out << dopplarTime.at(i).at(j) << endl;
        } 
      out.close();
