@@ -25,7 +25,7 @@ DAYDIR="${TODAY}-data"
 mkdir -p $CURDIR/nvsData/$DAYDIR
 
 # edit the timeout value to 20m when fully working
-timeout 20m cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
+timeout 60m cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
 
 # sleep for 15s to ensure the file has correctly been written fully
 sleep 15s
