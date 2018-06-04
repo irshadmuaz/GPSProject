@@ -1,0 +1,30 @@
+     2.10           OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE
+CONVBIN 2.4.3                           20180604 140752 UTC PGM / RUN BY / DATE 
+log: /home/cbrant/GPSdopplar/nvsData/2018-06-04-data/2018-06COMMENT             
+format: NVS BINR                                            COMMENT             
+                                                            MARKER NAME         
+                                                            MARKER NUMBER       
+                                                            OBSERVER / AGENCY   
+                                                            REC # / TYPE / VERS 
+                                                            ANT # / TYPE        
+        0.0000        0.0000        0.0000                  APPROX POSITION XYZ 
+        0.0000        0.0000        0.0000                  ANTENNA: DELTA H/E/N
+     1     1                                                WAVELENGTH FACT L1/2
+     8    C1    L1    D1    S1    C2    L2    D2    S2      # / TYPES OF OBSERV 
+  2018     6     4    14     6    2.7100000     GPS         TIME OF FIRST OBS   
+  2018     6     4    14     6    3.2100000     GPS         TIME OF LAST OBS    
+                                                            END OF HEADER       
+ 18  6  4 14  6  2.7100000  0  6G 7G 8G 9G16G23G26
+  23428993.684    -2878960.234        6124.362          40.000                  
+  21310018.897                        6272.248          26.000                  
+  20808422.691    -2360613.578        4897.590          46.000                  
+  21231356.250     -436019.896         938.002          29.000                  
+  20203728.351    -1332011.988        2689.897          44.000                  
+  23525114.804                         516.817          29.000                  
+ 18  6  4 14  6  3.2100000  0  6G 7G 8G 9G16G23G26
+  23428410.966    -2882022.262        6124.310          40.000                  
+  21309421.795                        6275.536          26.000                  
+  20807956.702    -2363062.218        4897.333          45.000                  
+  21231267.906     -436488.958         936.653          29.000                  
+  20203472.529    -1333356.757        2689.622          44.000                  
+  23525066.915                         514.914          29.000                  
