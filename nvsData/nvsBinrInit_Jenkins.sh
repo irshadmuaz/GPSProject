@@ -27,8 +27,8 @@ binrcmd -v NAVRATE 2
 # differential correction SBAS w/ RTCA troposphere model
 binrcmd -v DIFFCOR 2 1
 
-# request pvt vector data at rate of 2 Hz
-binrcmd -v PVT 2
+# request pvt vector data
+binrcmd -v PVT 1
 
 # raw data output in intervals of dezi-secs (100ms)
 # 1 -> 10Hz, 2 -> 5Hz, 5 -> 2Hz, 10 -> 1Hz (inverse
