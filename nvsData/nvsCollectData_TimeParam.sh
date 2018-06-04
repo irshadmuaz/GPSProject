@@ -1,7 +1,11 @@
 #!/bin/bash
-# nvsCollectData.sh
-# Finalized on 5/30/18
+# nvsCollectData_TimeParam.sh
+# Finalized on 6/4/18
 # Christopher Brant
+
+# Time length of test from command line including the minutes/hours/days
+# letter after the number for the parameter
+TIMEOUT=$1
 
 # todays date and time in UTC time
 TODAY="$(date -u +%F)"
@@ -24,10 +28,9 @@ DAYDIR="${TODAY}-data"
 # make the current day's directory if not already created
 mkdir -p $CURDIR/nvsData/$DAYDIR
 
-# edit the timeout value to 30m when fully working
-# as it will run for 30 minutes at the beginning of 
-# every hour on the hour from 8AM until 4PM daily
-timeout 30m cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
+# the timeout value will be a parameterized value so that
+# it can be tested at different time amounts
+timeout $TIMEOUT cat /dev/ttyAMA0 > $CURDIR/nvsData/$DAYDIR/$NVSFILE
 
 # sleep for 15s to ensure the file has correctly been written fully
 sleep 15s
