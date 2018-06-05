@@ -46,6 +46,7 @@ cd pullData/$SVDIR
 
 # unzip file
 gzip -d -c $FILENAME > $FILEOUT
+cp $FILEOUT currentNav
 
 # remove the zip file from the folder
 rm -f $FILENAME
