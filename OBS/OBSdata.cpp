@@ -87,7 +87,7 @@ int main (int argc, char * argv[])
 
 // position file to point to end of header
     file.seekg(i+12, file.beg);
-    string c;
+  
  }
  
  
@@ -129,19 +129,26 @@ void storeDopplar(ifstream& inFile, vector<vector<double>>& dopplarData,
        if(lineHold.length() > 30)
        {  
       // gathers list of satellite names and time into strings
-         satel_Head = lineHold.substr(30, lineHold.length() -30);
          time_Head = lineHold.substr(0, 30);
-     
+         satel_Head = lineHold.substr(30, lineHold.length() -30);
+
          if(isspace(satel_Head[0])) {satel_Head[0] = '0';}
  
          satNum = stoi(satel_Head.substr(0,2));
+
+         if(satNum > 12)
+         { 
+            std::string s2; 
+            getline(inFile, s2);
+            satel_Head = satel_Head + s2; 
+         }
          
       // Stores the section into the 2D vector. A section is the data
       // between data readings (between satellite headers)
          storeSection(inFile, satel_Head, satNum, satNames, dopplarData,
            dopplarTime, time_Head, CNdata);
        }
-  
+   
   } // closes while loop       
    
 }
@@ -187,6 +194,10 @@ void storeSection(ifstream& dataFile, string sat_Head, int satNum,
     Time thisTime;
     vector<Time> timeHold;
     thisTime = storeTime(time_Head);
+
+
+// if the number of satellites is over 12 the header will take up two lines, erase the spaces
+    if (satNum > 12) { sat_Head.erase(38,32); }
  
     for(i = 0; i < satNum; i++)
     {
