@@ -71,7 +71,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                
                // Begin new format
                 doppler_file_ << setw(3) << svid << " ";
-                doppler_file_ << setw(3) << raw_meas.rawmeasreap[ii].cno << " ";
+                doppler_file_ << setw(3) << (int)raw_meas.rawmeasreap[ii].cno << " ";
                 doppler_file_ << setw(10) << measDoppler << " ";
                 doppler_file_ << setw(12) << calcDoppler << " ";
                 doppler_file_ << setw(12) << measDoppler - calcDoppler << " ";
@@ -204,10 +204,12 @@ int main(int argc, char **argv)
 {
     Ublox my_gps;
 
+   
     if(argc < 3) {
         std::cerr << "Usage: ublox_example <serial port address> <baud rate>" << std::endl;
         return 0;
     }
+    
     std::string port(argv[1]);
     int baudrate=115200;
     istringstream(argv[2]) >> baudrate;
@@ -231,7 +233,7 @@ int main(int argc, char **argv)
     my_gps.set_rxm_raw_callback(PseudorangeData);
     //my_gps.set_nav_clock_callback(ClockData);
     my_gps.set_parsed_ephem_callback(ParsedEphems);
-    my_gps.set_nav_solution_callback(NavData);
+    //my_gps.set_nav_solution_callback(NavData);
 
     //! Configure ublox
     // request pseudorange data

@@ -14,22 +14,22 @@ int main(int argc, char *argv[])
 	NavParser NavMsg;
 	
    string reportName = "Report.txt";
-	double rec[3] = {654572, -5210045, 3608339}; 
+	double rec[3] = {654647.3767, -5210281.4233, 3608450.9628}; 
 
    if (argc < 2)
    {
       cout << "Error: Must provide a .nav file" << endl;
-      //return 0;
+      return 0;
    }
 
    if (argc == 5)
    {
-      rec[0] = stoi(argv[2]);
-      rec[1] = stoi(argv[3]);
-      rec[2] = stoi(argv[4]);
+      rec[0] = stod(argv[2]);
+      rec[1] = stod(argv[3]);
+      rec[2] = stod(argv[4]);
    }
 
-	NavMsg.ReadData("2018-05-08.nav");
+	NavMsg.ReadData(argv[1]);
 
    NavMsg.createReport(reportName, rec);
    

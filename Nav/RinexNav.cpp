@@ -138,7 +138,7 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.a = eph.sqrta * eph.sqrta;
 
    // Time difference
-   calc.dt = (time - eph.time);
+   calc.dt = (time - eph.time) - eph.svClkBias - eph.svClkDft * eph.timeOfMsg;
 
    // Calculate mean motion
    calc.n = sqrt(EARTH_GRAV / (calc.a * calc.a * calc.a)) + eph.dn;
@@ -224,13 +224,14 @@ void NavParser::createReport(string reportName, double pos[3])
    double measDoppler;
    double calcDoppler;
    double refDoppler; // Accounts for drift errors
+   float SNR;
 
    stringstream fileName;
    string line;
 
    report.open(reportName.c_str());
 
-   report << "PRN | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << endl;
+   report << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << endl;
 
    refDoppler = 0;
 
@@ -258,6 +259,7 @@ void NavParser::createReport(string reportName, double pos[3])
       while (!obsData.eof())
       {
          obsData >> measDoppler;
+         obsData >> SNR;
          if (!(obsData >> timeOfData)) break;
 
          calcDoppler = EphCalc(i, timeOfData, pos).doppler;
@@ -271,6 +273,7 @@ void NavParser::createReport(string reportName, double pos[3])
          calcDoppler += refDoppler;
          
          report << setw(3) << i << " ";
+         report << setw(5) << SNR << " ";
          report << setw(10) << measDoppler << " ";
          report << setw(12) << calcDoppler << " ";
          report << setw(12) << measDoppler - calcDoppler;
