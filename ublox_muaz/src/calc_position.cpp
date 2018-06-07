@@ -147,7 +147,119 @@ double Position::calcDistance(ecef satPos)
 }
 double Position::calcDoppler(int id, double _time)
 {
-	ecef t1 = this->calcPosition(id,_time); //satelite position
+   ParsedEphemData ephemeris = this->ephemeris[id];
+   struct CalcData calc;
+	struct EphData eph;
+
+	double   temp1;
+	double   temp2;
+	double   EOld;
+	int	   count;
+
+   double pos[3];
+   pos[0] = this->coords.ecefX;
+   pos[1] = this->coords.ecefY;
+   pos[2] = this->coords.ecefZ;
+
+   // Set the ephemris data
+   eph.crs = ephemeris.crs;
+   eph.dn = ephemeris.dN;
+   eph.m0 = ephemeris.anrtime;
+   eph.cuc = ephemeris.cuc;
+   eph.ecc = ephemeris.ecc;
+   eph.cus = ephemeris.cus;
+   eph.sqrta = ephemeris.majaxis;
+   eph.t = ephemeris.toe;
+   eph.cic = ephemeris.cic;
+   eph.omega = ephemeris.wo;
+   eph.cis = ephemeris.cis;
+   eph.inc = ephemeris.ia;
+   eph.crc = ephemeris.crc;
+   eph.w = ephemeris.omega;
+   eph.omegaDot = ephemeris.dwo;
+   eph.IDOT = ephemeris.dia;
+   
+   // Semimajor axis
+   calc.a = eph.sqrta * eph.sqrta;
+
+   // Time difference
+   calc.dt = (_time - eph.t);
+
+   // Calculate mean motion
+   calc.n = sqrt(EARTH_GRAV / (calc.a * calc.a * calc.a)) + eph.dn;
+
+   // Calculate mean anomaly
+   calc.M = eph.m0 + calc.n * calc.dt;
+
+   // Calculate eccentric anomaly using  Newton-Raphson
+   calc.E = calc.M;
+   count = 0;
+
+   do {
+      EOld = calc.E;
+      temp1 = 1.0 - eph.ecc * cos(EOld);
+      calc.E = calc.E + (calc.M - EOld + eph.ecc * sin(EOld)) / temp1;
+      count++;
+      if (count > 5)
+         break;
+   } while (fabs(calc.E - EOld) > 1.0E-14);
+
+   calc.EDot = calc.n / temp1;
+
+   // Begin calc for True anomaly and Argument of Latitude
+   temp2 = sqrt(1.0 - eph.ecc * eph.ecc);
+   calc.phi = atan2(temp2 * sin(calc.E), cos(calc.E) - eph.ecc) + eph.w;
+   calc.phiDot = temp2 * calc.EDot / temp1;
+
+   // Calculate corrected argument of latitude based on position
+   calc.mu = calc.phi + eph.cus * sin(2.0 * calc.phi) + eph.cuc * cos(2.0 * calc.phi);
+   calc.muDot = calc.phiDot * (1.0 + 2.0 * (eph.cus * cos(2.0 * calc.phi) - eph.cuc * sin(2.0 * calc.phi)));
+
+   // Calculate corrected radius based on argument of latitude
+   calc.rad = calc.a * temp1 + eph.crc * cos(2.0 * calc.phi) + eph.crs * sin(2.0 * calc.phi);
+   calc.radDot = calc.a * eph.ecc * sin(calc.E) * calc.EDot +
+      2.0 * calc.phiDot * (eph.crs * cos(2.0 * calc.phi) - eph.crc * sin(2.0 * calc.phi));
+
+   // Calculate inclination based on argument of latitude
+   calc.inc = eph.inc + eph.IDOT * calc.dt + eph.cic * cos(2.0 * calc.phi) +
+      eph.cis * sin(2.0 * calc.phi);
+   calc.incDot = eph.IDOT + 2 * calc.phiDot * (eph.cis * cos(2.0 * calc.phi) -
+      eph.cic * sin(2.0 * calc.phi));
+
+   // Calculate position and velocity in orbital plane
+   calc.xOrb = calc.rad * cos(calc.mu);
+   calc.yOrb = calc.rad * sin(calc.mu);
+   calc.xOrbDot = calc.radDot * cos(calc.mu) - calc.yOrb * calc.muDot;
+   calc.yOrbDot = calc.radDot * sin(calc.mu) + calc.xOrb * calc.muDot;
+
+   // Corrected longitude of ascending node
+   calc.omegaDot = eph.omegaDot - EARTH_ROT;
+   calc.omega = eph.omega + calc.dt * calc.omegaDot - EARTH_ROT * eph.t;
+
+   // Calculate coordinates
+   calc.pos[0] = calc.xOrb * cos(calc.omega) - calc.yOrb * cos(calc.inc) * sin(calc.omega);
+   calc.pos[1] = calc.xOrb * sin(calc.omega) + calc.yOrb * cos(calc.inc) * cos(calc.omega);
+   calc.pos[2] = calc.yOrb * sin(calc.inc);
+
+   // Calculate velocity
+   temp1 = calc.yOrbDot * cos(calc.inc) - calc.yOrb * sin(calc.inc) * calc.incDot;
+   calc.vel[0] = -calc.omegaDot * calc.pos[1] + calc.xOrbDot * cos(calc.omega) - temp1 * sin(calc.omega);
+   calc.vel[1] = calc.omegaDot * calc.pos[0] + calc.xOrbDot * sin(calc.omega) + temp1 * cos(calc.omega);
+   calc.vel[2] = calc.yOrb * cos(calc.inc) * calc.incDot + calc.yOrbDot * sin(calc.inc);
+
+   // Doppler
+   for (int k = 0; k < 3; k++)
+      calc.relPos[k] = pos[k] - calc.pos[k];
+
+   calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
+      sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
+
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 400
+
+   return calc.doppler;
+
+	/* OLD ecef t1 = this->calcPosition(id,_time); //satelite position
+   
 	t1.ecefX = this->coords.ecefX - t1.ecefX;
 	t1.ecefY = this->coords.ecefY - t1.ecefY;
 	t1.ecefZ = this->coords.ecefZ - t1.ecefZ;//user position - satelite position
@@ -160,7 +272,7 @@ double Position::calcDoppler(int id, double _time)
 	//double velocity = d2-d1;
 	//double doppler = 1575420000 * (1 - (velocity/299792458));
 	//doppler =  doppler - 1575420000;
-	return doppler;
+	return doppler; */
 }
 void Position::setCoords(double x, double y, double z)
 {

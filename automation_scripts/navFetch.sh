@@ -45,11 +45,11 @@ wget -4 -P pullData/$SVDIR $URL
 cd pullData/$SVDIR
 
 # unzip file
-gzip -d -c $FILENAME > $FILEOUT
-cp $FILEOUT currentNav
+gzip -d -c pullData/$SVDIR/$FILENAME > pullData/$SVDIR/$FILEOUT
+cp pullData/$SVDIR/$FILEOUT pullData/$SVDIR/currentNav
 
 # remove the zip file from the folder
-rm -f $FILENAME
+rm -f pullData/$SVDIR/$FILENAME
 
 # The following commands will be used to save the GPSdopplarBot git credentials on RasPi
 # git config credential.helper store
