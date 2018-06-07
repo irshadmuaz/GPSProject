@@ -62,36 +62,36 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
             << "\t" << setprecision(3) << raw_meas.rawmeasreap[ii].doppler; // m
-            if(myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid))
+            if(!myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid))
+            {
+               cout << "  Ephemeris Does Not Exist" << endl;
+            }
+            else if (raw_meas.rawmeasreap[ii].gnssId)
+            {
+               cout << "  Non-GPS Constellation" << endl;
+            }
+            else
             {
                 int svid = (unsigned int)raw_meas.rawmeasreap[ii].svid;
 
                 double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
                
-               // Begin new format
+               // Write to file
                 doppler_file_ << setw(3) << svid << " ";
-                doppler_file_ << setw(3) << raw_meas.rawmeasreap[ii].cno << " ";
+                doppler_file_ << setw(5) << (int)raw_meas.rawmeasreap[ii].cno << " ";
                 doppler_file_ << setw(10) << measDoppler << " ";
                 doppler_file_ << setw(12) << calcDoppler << " ";
                 doppler_file_ << setw(12) << measDoppler - calcDoppler << " ";
                 doppler_file_ << "0 0 0 0 0 " << raw_meas.iTow << endl;
 
-                //doppler_file_  << "\t" << svid << "\t" << setprecision(3) << measDoppler<<  "\t" 
-                //<< setprecision(3) << calcDoppler<<"\t"<<measDoppler - myPos.dopplers[svid]<<"\t"<<calcDoppler - myPos.calcDopplers[svid]<<endl; // m
-               
-               // End new format
-                cout<<"calc: "<<calcDoppler<<"\tmeasured: "<<measDoppler
-                <<"\tError"<<calcDoppler - measDoppler<<"\tDifferential "<< measDoppler - myPos.dopplers[svid]<<endl;
+               // Write to cout
+                cout << "  Calc: " << setw(12) << calcDoppler << "  Meas: "<< setw(12) << measDoppler
+                << "  Error: " << setw(12) << calcDoppler - measDoppler << endl;
 
                 myPos.dopplers[svid] = measDoppler;
                 myPos.calcDopplers[svid] = calcDoppler;
             }
-            else
-            {
-                cout<<" No ephemerisExists "<<endl;
-            }
-            //cout<<myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid)<<endl;
         }
         data_file_ << std::endl;
         data_file_ << fixed << "CNO" << "\t" << (signed long)raw_meas.iTow;
