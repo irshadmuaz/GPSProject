@@ -14,7 +14,11 @@ int main(int argc, char *argv[])
 	NavParser NavMsg;
 	
    string reportName = "Report.txt";
+<<<<<<< HEAD
+	double rec[3] = {654647.3767, -5210281.4233, 3608450.9628}; 
+=======
 	double rec[3] = {654771, -5209937, 3608422}; 
+>>>>>>> 667f1ef6aec0027efaf78e3e4b5fcf23c2925717
 
    if (argc < 2)
    {

@@ -138,7 +138,7 @@ struct CalcData NavParser::EphCalc(short int prn, Time time, double pos[3])
    calc.a = eph.sqrta * eph.sqrta;
 
    // Time difference
-   calc.dt = (time - eph.time);
+   calc.dt = (time - eph.time) - eph.svClkBias - eph.svClkDft * eph.timeOfMsg;
 
    // Calculate mean motion
    calc.n = sqrt(EARTH_GRAV / (calc.a * calc.a * calc.a)) + eph.dn;
