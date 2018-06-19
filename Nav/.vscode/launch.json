@@ -10,7 +10,7 @@
          "type": "cppdbg",
          "request": "launch",
          "program": "${workspaceFolder}/NavDoppler",
-         "args": [],
+         "args": ["zeck152k.18n"],
          "stopAtEntry": false,
          "cwd": "${workspaceFolder}",
          "environment": [],

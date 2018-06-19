@@ -42,6 +42,12 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
     try {
 
 
+         static double measBuffer[BUF_SIZE];
+         static double prevMeas = 0, prevCalc = 0;
+         double measDiff, calcDiff;
+         static int dopNum = 0;
+         double averageDop;
+
         
         data_file_ << fixed << "RANGE" << "\t" << (signed long)raw_meas.iTow;
         for(int ii=0;ii<raw_meas.numSV; ii++) {
@@ -79,19 +85,34 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                
                // Write to file
                 doppler_file_ << setw(3) << svid << " ";
-<<<<<<< HEAD
-                doppler_file_ << setw(3) << (int)raw_meas.rawmeasreap[ii].cno << " ";
-=======
                 doppler_file_ << setw(5) << (int)raw_meas.rawmeasreap[ii].cno << " ";
->>>>>>> 667f1ef6aec0027efaf78e3e4b5fcf23c2925717
                 doppler_file_ << setw(10) << measDoppler << " ";
                 doppler_file_ << setw(12) << calcDoppler << " ";
                 doppler_file_ << setw(12) << measDoppler - calcDoppler << " ";
                 doppler_file_ << "0 0 0 0 0 " << raw_meas.iTow << endl;
 
+               // Calculated moving average
+               measBuffer[dopNum++] = measDoppler;
+               dopNum %= BUF_SIZE;
+               averageDop = 0;
+               for (int m = 0; m < BUF_SIZE; m++)
+               {
+                  averageDop += measBuffer[m];
+               }
+               averageDop /= BUF_SIZE;
+
+               measDiff = averageDop - prevMeas;
+               calcDiff = calcDoppler - prevCalc;
+               prevMeas = averageDop;
+               prevCalc = calcDoppler;
+
+
                // Write to cout
-                cout << "  Calc: " << setw(12) << calcDoppler << "  Meas: "<< setw(12) << measDoppler
-                << "  Error: " << setw(12) << calcDoppler - measDoppler << endl;
+                cout << "  Calc: " << setw(8) << calcDoppler << "  Meas: "<< setw(8) << measDoppler
+                << "  Error: " << setw(8) << calcDoppler - measDoppler
+                << "  CalcDiff: " << setw(8) << calcDiff
+                << "  MeasDiff: " << setw(8) << measDiff
+                << "  DiffError: " << setw(8) << calcDiff - measDiff;
 
                 myPos.dopplers[svid] = measDoppler;
                 myPos.calcDopplers[svid] = calcDoppler;
