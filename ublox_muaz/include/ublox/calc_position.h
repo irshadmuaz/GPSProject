@@ -10,6 +10,7 @@
 #define bOMEGAE84           7.2921151467e-5
 #define EARTH_GRAV   3.986008e14
 #define EARTH_ROT    7.292115167e-5
+#define BUF_SIZE 300
 #include <iostream>
 #include <string>
 #include <map>
@@ -97,3 +98,4 @@ struct CalcData
 	double   relPos[3];  // Relative position compared to reciever
 	double   doppler;    // Doppler in Hz
 };
+

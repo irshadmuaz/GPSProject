@@ -116,7 +116,7 @@ void NavParser::ReadBody()
 		// BROADCAST ORBIT - 7
 		getline(inFile, line);
 		satEph[i].timeOfMsg =	stod(line.substr(3, 19));
-		satEph[i].fitInterval =	stod(line.substr(22, 19));
+		//satEph[i].fitInterval =	stod(line.substr(22, 19));
 	}
 }
 
@@ -273,7 +273,7 @@ void NavParser::createReport(string reportName, double pos[3])
          calcDoppler += refDoppler;
          
          report << setw(3) << i << " ";
-         report << setw(5) << SNR << " ";
+         report << setw(5) << (int)SNR << " ";
          report << setw(10) << measDoppler << " ";
          report << setw(12) << calcDoppler << " ";
          report << setw(12) << measDoppler - calcDoppler;

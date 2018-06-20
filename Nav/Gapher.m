@@ -18,6 +18,7 @@ A = A';
 timeStamps = A(11, :) + 60 * (A(10, :) + 60 * A(9, :));
 timeBegin = min(timeStamps);
 corrTime = timeStamps - timeBegin;
+maxTime = max(corrTime);
 
 % Length of A
 ASize = length(timeStamps);
@@ -39,35 +40,74 @@ for i = 1:ASize
             satName = strcat('G0', num2str(PRN));
         end
         
+        % Differentials
+        dCalc = diff(A(4, startIndex:i-1))./diff(corrTime(startIndex:i-1));
+        %dMeas = diff(A(3, startIndex:i-1))./diff(corrTime(startIndex:i-1));
+        Meas = smooth(A(3, startIndex:i-1), 300);
+        dMeas = diff(Meas')./diff(corrTime(startIndex:i-1));
+        
         % Predicted & Measured Doppler Plot
         subplot(3, 1, 1);
         
-        hold on;        
+        hold on;  
         plot(corrTime(startIndex:i-1), A(3, startIndex:i-1), '.', ...
         'MarkerSize', 10, 'color', 'b');
         plot(corrTime(startIndex:i-1), A(4, startIndex:i-1), '.', ...
         'MarkerSize', 10, 'color', 'r');
+        
+        
     
         title(strcat(satName, ': Measured and Predicted Doppler Effects'));
         xlabel('Time from start (sec)');
         ylabel('Doppler (Hz)');
         legend({'Measured Doppler', 'Predicted Doppler'});
         grid on;
+        %xlim([0,maxTime]);
         
-        % Predicted - Measured Comparison Plot
+        % Predicted & Measured Differential Plot
         subplot(3, 1, 2);
         
-        plot(corrTime(startIndex:i-1), A(4, startIndex:i-1) - A(3, startIndex:i-1), ...
-        '.', 'MarkerSize', 10, 'color', 'b'); 
-        
-        title(strcat(satName, ': Doppler Effects Comparison'));
-        xlabel('Time from start (sec)'); 
-        ylabel('Difference = Predicted - Measured Doppler (Hz)');
+        hold on;   
+        plot(corrTime(startIndex:i-2), dMeas, '.', ...
+        'MarkerSize', 10, 'color', 'b');
+        plot(corrTime(startIndex:i-2), dCalc, '.', ...
+        'MarkerSize', 10, 'color', 'r');
+    
+        title(strcat(satName, ': Measured and Predicted Doppler Differential'));
+        xlabel('Time from start (sec)');
+        ylabel('Doppler Differential (Hz/sec)');
+        legend({'Measured Differential', 'Predicted Differential'});
         grid on;
-
-        % SNR Plot
-        subplot(3, 1, 3);
+        %xlim([0,maxTime]);
         
+        % Predicted - Measured Comparison Plot
+%         subplot(3, 1, 2);
+%         
+%         plot(corrTime(startIndex:i-1), A(4, startIndex:i-1) - A(3, startIndex:i-1), ...
+%         '.', 'MarkerSize', 10, 'color', 'b'); 
+%         
+%         title(strcat(satName, ': Doppler Effects Comparison'));
+%         xlabel('Time from start (sec)'); 
+%         ylabel('Difference = Predicted - Measured Doppler (Hz)');
+%         grid on;
+%         xlim([0,maxTime]);
+%         ylim([50, 250]);
+
+        % Differential Plot
+         subplot(3, 1, 3);
+%         
+%         dy = diff(A(3, startIndex:i-1))./diff(corrTime(startIndex:i-1));
+%         
+%         plot(corrTime(startIndex:i-2), dy, '.', ...
+%         'MarkerSize', 10, 'color', 'b');
+%         
+%         title(strcat(satName, ': Doppler Differential'));
+%         xlabel('Time from start (sec)'); 
+%         ylabel('Differential (Hz/Sec)');
+%         grid on;
+        %xlim([0,maxTime]);
+        
+        % SNR Plot
         plot(corrTime(startIndex:i-1), A(2, startIndex:i-1), '.', ...
         'MarkerSize', 10, 'color', 'b');
         
@@ -75,6 +115,7 @@ for i = 1:ASize
         xlabel('Time from start (sec)'); 
         ylabel('SNR (unitless)');
         grid on;
+        xlim([0,maxTime]);
 
         startIndex = i;
         
