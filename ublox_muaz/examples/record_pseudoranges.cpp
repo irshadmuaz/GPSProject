@@ -3,7 +3,7 @@
 #include <fstream>
 #include "ublox/calc_position.h"
 // #include "boost/filesystem.hpp"
-
+#define BUF_SIZE 600
 using namespace ublox;
 using namespace std;
 
