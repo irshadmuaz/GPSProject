@@ -3,7 +3,7 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey
-Last Modified: 6/7/2018
+Last Modified: 6/19/2018
 '''
 ## Import Libraries ##
 from ctypes import *
@@ -551,3 +551,112 @@ class Create_2:
 		#Play song
 		self.conn.write(b'\x8d\x00') # 141, 0
 		time.sleep(2) # Wait for song to play
+
+##################################################################
+## Additional Functions ##
+''' Returns Roomba spin amount to achieve desired heading set point
+	Parameters:
+		angle = float; Current direction of Roomba (in degrees)
+			The value you are currenting "facing"
+		desired_heading = float; Desired direction set point (in degrees)
+			The value that you want to "face"
+		epsilon = float; value of a buffer zone on either side of the set point (in degrees)
+			Allows for reduced shaking when reaching the desired set point
+	Returns:
+		spin_value = int; The value needed to spin the Roomba from the current "angle" to the "desired_heading"
+			The value is larger the farther from the set point
+	'''
+def DHTurn(angle, desired_heading, epsilon):
+	# Threshold Constants
+	thresh_1 = (50 * epsilon) # First threshold value (degrees)
+	thresh_2 = (10 * epsilon) # Second threshold value (degrees)
+	
+	diff = abs(angle - desired_heading)
+	# Determine spin speed based on thresholds
+	if (diff > thresh_1 and diff < (360 - thresh_1)):
+		spin_value = 100 # Move faster when farther away from the set point
+	elif (diff > thresh_2 and diff < (360 - thresh_2)):
+		spin_value = 50 # Move slower when closer to the set point
+	else:
+		spin_value = 15 # Move very slow when very close to the set point
+		# Reduces oscillations due to magnetometer variation and loop execution rate
+	
+	# Determine direction of spin
+	if desired_heading < epsilon: # if 0 <= desired_heading < epsilon 
+		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
+			return -spin_value # Spin Left (CCW)
+		elif (angle < (360 + desired_heading - epsilon)): # and angle >= (desired_heading + 180) 
+			return spin_value # Spin Right (CW)
+		else: # if (360 + desired_heading - epsilon) < angle < (desired_heading + epsilon)
+			return 0 # Stop Spinning
+	elif desired_heading < 180: # and desired_heading >= epsilon...
+		if (angle > (desired_heading + epsilon) and angle < (desired_heading + 180)):
+			return -spin_value # Spin Left (CCW)
+		elif (angle < (desired_heading - epsilon) or angle >= (desired_heading + 180)):
+			return spin_value # Spin Right (CW)
+		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon)
+			return 0 # Stop Spinning
+	elif desired_heading < (360 - epsilon):
+		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
+			return spin_value # Spin Right (CW)
+		elif (angle > (desired_heading + epsilon) or angle <= (desired_heading - 180)):
+			return -spin_value # Spin Left (CCW)
+		else: # if (desired_heading - epsilon) < angle < (desired_heading + epsilon) 
+			return 0 # Stop Spinning
+	else: # if desired_heading >= (360 - epsilon)
+		if (angle < (desired_heading - epsilon) and angle > (desired_heading - 180)):
+			return spin_value # Spin Right (CW)
+		elif (angle > (desired_heading + epsilon - 360)): # and (angle <= (desired_heading - 180))
+			return -spin_value # Spin Left (CCW)
+		else: # if (angle > (desired_heading - epsilon) or angle < (desired_heading + epsilon - 360))
+			return 0 # Stop Spinning
+
+''' Returns Roomba forward speed to make sure it can reach a certain set point
+		in a direction of "desired_heading" a distance "distance" millimeters away
+	Parameters:
+		angle = float; Current direction of Roomba (in degrees)
+			The value you are currenting "facing"
+		desired_heading = float; Direction to the set point (in degrees)
+			The value that you want to "face"
+		distance = float; Straight-line distance to the set point
+			The distance that you still need to go to get to the set point
+	Returns:
+		forward_value = int; forward speed for Roomba to travel to reach the set point
+			The value is larger the farther away from the set point
+			The value is zero if the set point is unreachable at the standard forward_value
+	'''
+def DDSpeed(angle, desired_heading, distance):
+	# Threshold Constants
+	spin_thresh_1 = 25 # First spin threshold value (degrees)
+	spin_thresh_2 = 5 # Second spin threshold value (degrees)
+	forward_thresh_1 = 100 # First forward threshold value (mm)
+	
+	diff = abs(angle - desired_heading)
+	# Determine spin speed based on thresholds (Same as DHTurn())
+	if (diff > spin_thresh_1 and diff < (360 - spin_thresh_1)):
+		spin_value = 100 # Move faster when farther away from the set point
+	elif (diff > spin_thresh_2 and diff < (360 - spin_thresh_2)):
+		spin_value = 50 # Move slower when closer to the set point
+	else:
+		spin_value = 15 # Move very slow when very close to the set point
+		# Reduces oscillations due to magnetometer variation and loop execution rate
+	
+	if distance > forward_thresh_1:
+		forward_value = 100 # Move faster when farther away from the set point
+	else:
+		forward_value = 50 # Move slower when closer to the set point
+	
+	# Roomba Constants
+	WHEEL_SEPARATION = 235 # millimeters
+	
+	# Radius of unreachable region at the given forward and spin values
+	radius = WHEEL_SEPARATION * (((forward_value + spin_value)/(2 * spin_value)) - 0.5)
+	# Minimum distance that can be guaranteed to be reached for the given forward and spin values
+	d_min = radius * math.sqrt(2 * (1 - math.cos(math.radians(2*diff))))
+	
+	if (diff > 90 and diff < 270) and distance < (2 * radius): # Special case
+		return 0 # Need to turn around to get to the close set point
+	if d_min > distance: # Normal cases
+		return 0 # Need to turn some to get to the close set point
+	else:
+		return forward_value # We can head forward to reach the set point
