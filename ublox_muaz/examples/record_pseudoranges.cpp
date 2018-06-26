@@ -92,7 +92,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                 doppler_file_ << "0 0 0 0 0 " << raw_meas.iTow << endl;
 
                // Calculated moving average
-               measBuffer[dopNum++] = measDoppler;
+               /*measBuffer[dopNum++] = measDoppler;
                dopNum %= BUF_SIZE;
                averageDop = 0;
                for (int m = 0; m < BUF_SIZE; m++)
@@ -104,15 +104,15 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                measDiff = averageDop - prevMeas;
                calcDiff = calcDoppler - prevCalc;
                prevMeas = averageDop;
-               prevCalc = calcDoppler;
+               prevCalc = calcDoppler;*/
 
 
                // Write to cout
                 cout << "  Calc: " << setw(8) << calcDoppler << "  Meas: "<< setw(8) << measDoppler
-                << "  Error: " << setw(8) << calcDoppler - measDoppler
-                << "  CalcDiff: " << setw(8) << calcDiff
+                << "  Error: " << setw(8) << calcDoppler - measDoppler << endl;
+                /*<< "  CalcDiff: " << setw(8) << calcDiff
                 << "  MeasDiff: " << setw(8) << measDiff
-                << "  DiffError: " << setw(8) << calcDiff - measDiff;
+                << "  DiffError: " << setw(8) << calcDiff - measDiff << endl;*/
 
                 myPos.dopplers[svid] = measDoppler;
                 myPos.calcDopplers[svid] = calcDoppler;

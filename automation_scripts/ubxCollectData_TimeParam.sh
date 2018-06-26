@@ -14,8 +14,6 @@ MINUTE="$(date -u +%M)"
 
 # create the filename for the nvs file
 FILENAME="$TODAY-$HOUR$MINUTE"
-# .nvs file is the first argument
-NVSFILE="$FILENAME.nvs"
 # .obs file name is the second
 OBSFILE="$FILENAME.obs"
 # .nav file name is the third
