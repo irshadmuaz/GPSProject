@@ -43,7 +43,7 @@ for i = 1:ASize
         % Differentials
         dCalc = diff(A(4, startIndex:i-1))./diff(corrTime(startIndex:i-1));
         %dMeas = diff(A(3, startIndex:i-1))./diff(corrTime(startIndex:i-1));
-        Meas = smooth(A(3, startIndex:i-1), 300);
+        Meas = smooth(A(3, startIndex:i-1), 600);
         dMeas = diff(Meas')./diff(corrTime(startIndex:i-1));
         
         % Predicted & Measured Doppler Plot

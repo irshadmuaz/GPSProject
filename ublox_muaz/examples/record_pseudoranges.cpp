@@ -3,7 +3,7 @@
 #include <fstream>
 #include "ublox/calc_position.h"
 // #include "boost/filesystem.hpp"
-
+#define BUF_SIZE 600
 using namespace ublox;
 using namespace std;
 
@@ -45,6 +45,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
          static double measBuffer[BUF_SIZE];
          static double prevMeas = 0, prevCalc = 0;
          double measDiff, calcDiff;
+         vector <double> vecDop;
          static int dopNum = 0;
          double averageDop;
 
@@ -64,7 +65,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
         data_file_ << std::endl;
         data_file_ << fixed << "DOPPLER" << "\t" << (double)raw_meas.iTow;
 
-        
+        vecDop.clear();
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
             << "\t" << setprecision(3) << raw_meas.rawmeasreap[ii].doppler; // m
@@ -106,6 +107,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                prevMeas = averageDop;
                prevCalc = calcDoppler;*/
 
+               vecDop.push_back(calcDoppler - measDoppler);
 
                // Write to cout
                 cout << "  Calc: " << setw(8) << calcDoppler << "  Meas: "<< setw(8) << measDoppler
