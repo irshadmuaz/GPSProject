@@ -3,8 +3,9 @@ Purpose: Uses Roomba wheel encoders to determine angle and distance
 	Moves to user input x and y coordinates
 	Uses only one "while" loop and uses bump sensors to avoid obstacles
 	Writes all data into a text file for data retrieval
+	Uses Roomba Query Stream to retrieve data
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/20/2018
+Last Modified: 6/26/2018
 '''
 ## Import libraries ##
 import serial
@@ -96,16 +97,17 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 print("Hello, and welcome to Roomba_Encoder_Test4.")
 print("In this program, you get to specify the x,y coordinates you want the Roomba to move to.")
 print("The Roomba navigates around any obstacles in its path.")
-print("Any data generated in the run will be stored in a text file.")
-# Create text file for data storage
+#print("Any data generated in the run will be stored in a text file.")
+'''# Create text file for data storage
 data_name = input("File name for data? ")
 data_name_string = data_name + ".txt" # Add the ".txt" to the end
 datafile = open(data_name_string, "w") # Open a text file for storing data
 # Write data header for the data file; includes name of each column
 datafile.write("Time Stamp, Total Distance Traveled, Distance to Desired Point, Current Angle, Desired Heading, Left Wheel Encoders, Right Wheel Encoders, Left Wheel Speed, Right Wheel Speed, Y-Position, X-position, Bumper Byte, Light Bumper Byte\n")
-
+'''
 # Get initial angle from IMU
 angle = imu.CalculateHeading()
+#angle = 0
 
 #input the speed
 spnspd = 100
@@ -126,76 +128,41 @@ y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
 
+# Read in initial wheel count values from Roomba
+Roomba.SendQuery(7,43,44,42,41,45)
+while Roomba.Available() == 0:
+	pass # Wait for sensor packet values to be returned
+bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.ReadQuery(7, 43, 44, 42, 41, 45) # Read new wheel counts
+
 while True:
 	try:
-		# Read in initial wheel count values from Roomba
-		bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
-		
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
 		# Request for the desired angle to turn to
-        # x_new = float(input("Desired x-coordinate? "))
-        # y_new = float(input("Desired y-coordinate? "))
-
-        while True:
-            try:
-                desired_heading = float(input("Desired heading?"))
-                Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
-                    
-                    if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
-                        bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
-                            
-                            # Record the current time since the beginning of loop
-                            data_time = time.time() - base
-                                
-                                # Calculate the count differences and correct for overflow
-                                delta_l_count = (l_counts - l_counts_current)
-                                    if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
-                                        delta_l_count -= pow(2,16)
-                                        if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
-                                            delta_l_count += pow(2,16)
-                                        delta_r_count = (r_counts - r_counts_current)
-                                        if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
-                                            delta_r_count -= pow(2,16)
-                                        if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
-                                            delta_r_count += pow(2,16)
-                                        # Calculated the forward distance traveled since the last counts
-                                        distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
-                                        # Calculated the turn angle change since the last counts
-                                        angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
-                                        distance += distance_change # Updated distance of Roomba
-                                        angle += angle_change # Update angle of Roomba and correct for overflow
-                                        if angle >= 360 or angle < 0:
-                                            angle = (angle % 360) # Normalize the angle value from [0,360)
-                                        # Calculate position data
-                                        delta_x_pos = distance_change * math.cos(math.radians(angle))
-                                        delta_y_pos = distance_change * math.sin(math.radians(angle))
-                                        x_pos += delta_x_pos
-                                        y_pos += delta_y_pos
-                                        
-                                        # The direction from the current position to the desired position
-                                    desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
-            except KeyboardInterrupt:
-                break # Break out of the loop early if something wrong happens
-
-
-        input_distance = float(input("Desired distance?"))
+		x_new = float(input("Desired x-coordinate? "))
+		y_new = float(input("Desired y-coordinate? "))
 		desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
 		desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
 		
 		data_time = 0.0 # 0 seconds initial
 		# Print out initial data point
-		datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts_current, r_counts_current, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+		#datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts_current, r_counts_current, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+		# Start Query Data Stream
+		Roomba.StartQueryStream(7,43,44,42,41,45)
 		# Restart base timers
 		base = time.time()
 		query_base = time.time()
 		
-		while desired_distance > 1: # Until we have reached the location...
+		while desired_distance > 2: # Until we have reached the location...
 			try:
-				Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
-				
-				if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
-					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+				'''if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
+					byte_num = Roomba.SendQuery(7,43,44,42,41,45) # Send packet bytes to Roomba
+					# Returns the number of bytes to be received.
+					# Reset base for query
+					query_base += query_timer
+				'''
+				if Roomba.Available() > 0:
+					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.ReadQueryStream(7,43,44,42,41,45) # Read new wheel counts
 					
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
@@ -284,19 +251,26 @@ while True:
 							spin_value = set_spin_value # Set it to the set speed
 					
 					# Print out pertinent data values
-					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5:0>8b}, {6:0>8b};".format(data_time, desired_distance, angle, y_pos, x_pos, bumper_byte, light_bumper))
+					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5:0>8b}, {6:0>8b}, {7}, {8};".format(data_time, desired_distance, angle, y_pos, x_pos, bumper_byte, light_bumper, l_counts, r_counts))
 					# Write data values to a text file
-					datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+					#datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+					
+					Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
+					
 					# Update current wheel encoder counts
 					l_counts_current = l_counts
 					r_counts_current = r_counts
-					# Reset base for query
-					query_base += query_timer
 				
 			except KeyboardInterrupt: 
 				break # Break out of the loop early if something wrong happens
 			
-		Roomba.Move(0,0) # Stop Roomba movement
+		forward_value = 0 # initial forward speed value (mm/s)
+		spin_value = 0 # initial spin speed value (mm/s)
+		Roomba.Move(forward_value, spin_value) # Stop Roomba movement
+		Roomba.PauseQueryStream()
+		if Roomba.Available() > 0:
+			x = Roomba.DirectRead(Roomba.Available()) # Clear out residual Roomba data
+			#print(x) # Include for debugging purposes
 		
 	except KeyboardInterrupt:
 		print("") # Move cursor down a line
@@ -305,7 +279,7 @@ while True:
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 GPIO.output(gled, GPIO.LOW) # Turn off green LED
-datafile.close()
+#datafile.close()
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close() # Close Xbee serial connection

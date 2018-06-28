@@ -3,7 +3,7 @@ Purpose: Python Library with LSM9DS1 class and specific functions
 	and iRobot Create 2 (Roomba) class and specific functions
 Import this file in main Python file to access functions
 Made by: Timothy Anglea, Joshua Harvey
-Last Modified: 6/19/2018
+Last Modified: 6/28/2018
 '''
 ## Import Libraries ##
 from ctypes import *
@@ -11,6 +11,7 @@ import time
 import math
 import serial
 
+##################################################################
 ## LSM9DS1 IMU Class ##
 class LSM9DS1_IMU:
 	''' Initialization stuff for the IMU
@@ -80,7 +81,7 @@ class LSM9DS1_IMU:
 		self.gy_offset = 0.0
 		self.gz_offset = 0.0
 	
-	# IMU Functions/Methods #
+	## IMU Functions/Methods ##
 	''' Read X, Y, and Z components of magnetometer
 		Returns:
 			cmx = float; x-value of magnetometer (Gauss)
@@ -335,7 +336,7 @@ class Create_2:
 		57: [2, True], # Side Brush Motor Current
 		58: [1, False], # Stasis
 	}
-	# Dictionary of packet group byte size and packet ID list
+	# Dictionary of packet group byte size and packet ID list; UNTESTED
 	packet_group_dict = {
 		0: [26, list(range(7,27))],
 		1: [10, list(range(7,17))],
@@ -430,7 +431,7 @@ class Create_2:
 			packetID = integer; ID number for Roomba sensor packet
 		Returns:
 			integer; Value of the requested Roomba sensor packet
-		Do not request the same packet more than once every 15 ms. '''
+		Do not request the same packet more than once every 15.625 ms. '''
 	def QuerySingle(self, packetID):
 		self.conn.write(b'\x8e') # Request single sensor packet (142)
 		self.DirectWrite(packetID) # Send packet ID of requested sensor
@@ -443,11 +444,12 @@ class Create_2:
 		return int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
 	
 	''' Request and Return a list of Roomba sensor packets
+		Combination of SendQuery() and Read(Query)
 		Parameters:
 			*args = integers; sequence of integers representing ID number of Roomba sensor packets
 		Returns:
 			integer list; List of values of requested packets, given in the order as requested
-		Do not request the same set of packets more than once every 15 ms. '''
+		Do not request the same set of packets more than once every 15.625 ms. '''
 	def Query(self, *args):
 		num = len(args) # Find number of packets to request
 		self.conn.write(b'\x95') # Request sensor query (149)
@@ -458,6 +460,32 @@ class Create_2:
 		while self.conn.inWaiting() == 0:
 			pass # Wait for sensor packet values to be returned
 		
+		data = [] # Create empty list
+		for packetID in args:
+			byte, sign = self.packet_dict[packetID] # Get packet info
+			# Add the sensor value to the list
+			data.append(int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign))
+		return data # Return the list of values
+		
+	''' Request a list of Roomba sensor packets
+		Parameters:
+			*args = integers; sequence of integers representing ID number of Roomba sensor packets
+		Do not request the same set of packets more than once every 15.625 ms. '''
+	def SendQuery(self, *args):
+		num = len(args) # Find number of packets to request
+		self.conn.write(b'\x95') # Request sensor query (149)
+		self.DirectWrite(num) # Number of packets to request
+		for packetID in args:
+			self.DirectWrite(packetID) # Send packet ID for each sensor packet to request
+		
+	''' Return a list of Roomba sensor packets
+		Parameters:
+			*args = integers; sequence of integers representing ID number of Roomba sensor packets
+				Needs to be the same sequence as used in SendQuery()
+		Returns:
+			integer list; List of values of requested packets, given in the order as requested
+		Make sure the bytes are in the Roomba buffer before calling this function'''
+	def ReadQuery(self, *args):
 		data = [] # Create empty list
 		for packetID in args:
 			byte, sign = self.packet_dict[packetID] # Get packet info
@@ -485,42 +513,43 @@ class Create_2:
 				Returns a zero for any packet that is requested, but not sent from the Roomba
 		Do not call this function until you have started or resumed the Query Stream
 		Make sure data is in the Roomba buffer before calling this function
-		Roomba updates stream every 15 ms '''
+		Roomba updates stream every 15.625 ms '''
 	def ReadQueryStream(self, *args):
 		value_dict = {} # Empty dictionary to store packet values
-		# Read in the header byte value
-		header = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-		if header == 19: # Header value for data stream
-			# Number of bytes to read (not counting checksum)
-			num = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-			check = (19 + num) # cummulative total of all byte values
+		
+		header = 0 # Initial the header value
+		while header != 19: # Continues when the header byte is found; Error may result if a packet value is 19
+			# Read in the header byte value
+			header = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
+		
+		# Number of bytes to read (not counting checksum)
+		num = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
+		check = 19 + num # cummulative total of all byte values
+		
+		while num > 0: # Go until we reach the checksum
+			# The first byte is the packet ID
+			packetID = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
+			byte, sign = self.packet_dict[packetID] # Get packet info
+			# Determine the value of the current packet
+			value = int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
+			value_dict[packetID] = value # Create new entry in the dictionary
+			# Calculate byte sum of the packet ID and value
+			check += packetID # Add in the packet ID value
+			buffer = (value).to_bytes(byte, byteorder='big', signed=sign)
+			byte_value = int.from_bytes(buffer, byteorder='big', signed=False) # Convert to unsigned integer
+			while byte_value > 255:
+				check += (byte_value % 256) # Value of low byte
+				byte_value = (byte_value // 256) # Value of high byte
+			check += byte_value # Add in packet value
 			
-			while num > 0: # Go until we reach the checksum
-				# The first byte is the packet ID
-				packetID = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-				byte, sign = self.packet_dict[packetID] # Get packet info
-				# Determine the value of the current packet
-				value = int.from_bytes(self.conn.read(byte), byteorder='big', signed=sign)
-				value_dict[packetID] = value # Create new entry in the dictionary
-				# Calculate byte sum of the packet ID and value
-				check += packetID # Add in the packet ID value
-				buffer = (value).to_bytes(byte, byteorder='big', signed=sign)
-				byte_value = int.from_bytes(buffer, byteorder='big', signed=False) # Convert to unsigned integer
-				while byte_value > 255:
-					check += (byte_value % 256) # Value of low byte
-					byte_value = (byte_value // 256) # Value of high byte
-				check += byte_value # Add in packet value
-				
-				num -= (byte + 1) # Update the number of bytes left to read
-			
-			# Read the check sum value
-			checksum = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
-			check += checksum
-			if (check % 256) != 0: # If checksum isn't correct
-				value_dict.clear() # Erase dictionary; it is corrupted
-			
-		else: # Incorrect header byte value
-			x = self.conn.read(self.conn.inWaiting()) # Clear out buffer; return nothing
+			num -= (byte + 1) # Update the number of bytes left to read
+		
+		# Read the check sum value
+		checksum = int.from_bytes(self.conn.read(1), byteorder='big', signed=False)
+		check += checksum
+		if (check % 256) != 0: # If checksum isn't correct
+			value_dict.clear() # Erase dictionary; it is corrupted
+		
 		# return data found
 		data = [] # Create empty list
 		for packetID in args:
@@ -530,6 +559,7 @@ class Create_2:
 		
 		return data # Return the list of values
 		
+	
 	''' Pause the current Query Stream
 		Does not erase the last set of packets requested '''
 	def PauseQueryStream(self):
