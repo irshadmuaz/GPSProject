@@ -616,13 +616,13 @@ class Create_2:
 		# Define GoT Theme song
 		self.conn.write(b'\x8c\x02\x09') # 140, 2, 9
 		self.conn.write(b'\x43\x48\x3c\x48\x3f\x0c\x41\x0c\x43\x30\x3c\x30\x3f\x0c\x41\x0c\x3e\x30')
-		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h, 63,  e, 65,  e, 63,  h
+		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h, 63,  e, 65,  e, 63, h.
 		time.sleep(0.05)
 
 	def PlayGoT3(self):
 		# Play song
 		self.conn.write(b'\x8d\x02') # 141, 2
-		time.sleep(5.30) # Wait for song to play
+		time.sleep(5.65) # Wait for song to play
 
 
 
