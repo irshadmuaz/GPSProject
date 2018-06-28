@@ -51,6 +51,7 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	x = Roomba.DirectRead(Roomba.Available()) # Clear out Roomba boot-up info
 	#print(x) # Include for debugging
 
+'''
 print(" ROOMBA Setup Complete")
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
@@ -75,9 +76,16 @@ GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # Include for debugging
+	'''
 
 # Main Code #
 Roomba.PlayGoT1()
+Roomba.PlayGoT1()
+Roomba.PlayGoT1()
+Roomba.PlayGoT1()
+Roomba.PlayGoT2()
+Roomba.PlayGoT2()
+Roomba.PlayGoT2()
 Roomba.PlayGoT2()
 Roomba.PlayGoT3()
 
