@@ -582,6 +582,42 @@ class Create_2:
 		self.conn.write(b'\x8d\x00') # 141, 0
 		time.sleep(2) # Wait for song to play
 
+	''' Game of Thrones Theme Song Part 1
+		'''
+	def PlayGoT1(self):
+		# Define GoT Theme song
+		self.conn.write(b'\x8c\x00\x0b') # 140, 0, 11
+		self.conn.write(b'\x43\x40\x3c\x40\x3f\x20\x41\x20')
+		#					67,  q, 60,  q, 63,  e, 65,  e
+		time.sleep(0.05)
+		# Play song
+		self.conn.write(b'\x8d\x00') # 141, 0
+		time.sleep(3) # Wait for song to play
+
+	''' Game of Thrones Theme Song Part 2
+		'''
+	def PlayGoT2(self):
+		# Define GoT Theme song
+		self.conn.write(b'\x8c\x00\x0b') # 140, 1, 11
+		self.conn.write(b'\x43\x40\x3c\x40\x40\x20\x41\x20')
+		#					67,  q, 60,  q, 64,  e, 65,  e
+		time.sleep(0.05)
+		# Play song
+		self.conn.write(b'\x8d\x00') # 141, 1
+		time.sleep(3) # Wait for song to play
+
+	''' Game of Thrones Theme Song Part 3
+		'''
+	def PlayGoT3(self):
+		# Define GoT Theme song
+		self.conn.write(b'\x8c\x00\x0b') # 140, 2, 11
+		self.conn.write(b'\x43\xA0\x3c\xA0\x3f\x20\x41\x20\x43\x80\x3c\x80')
+		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h
+		time.sleep(0.05)
+		# Play song
+		self.conn.write(b'\x8d\x00') # 141, 2
+		time.sleep(10) # Wait for song to play
+
 ##################################################################
 ## Additional Functions ##
 ''' Returns Roomba spin amount to achieve desired heading set point
