@@ -591,11 +591,6 @@ class Create_2:
 		#					67,  q, 60,  q, 63,  e, 65,  e
 		time.sleep(0.05)
 
-	def PlayGoT1(self):
-		# Play song
-		self.conn.write(b'\x8d\x00') # 141, 0
-		time.sleep(1.15) # Wait for song to play
-
 	''' Game of Thrones Theme Song Part 2
 		'''
 	def WriteGoT2(self):
@@ -604,11 +599,6 @@ class Create_2:
 		self.conn.write(b'\x43\x18\x3c\x18\x40\x0c\x41\x0c')
 		#					67,  q, 60,  q, 64,  e, 65,  e
 		time.sleep(0.05)
-
-	def PlayGoT2(self):
-		# Play song
-		self.conn.write(b'\x8d\x01') # 141, 1
-		time.sleep(1.15) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 3
 		'''
@@ -619,22 +609,20 @@ class Create_2:
 		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h, 63,  e, 65,  e, 63, h.
 		time.sleep(0.05)
 
-	def PlayGoT3(self):
-		# Play song
-		self.conn.write(b'\x8d\x02') # 141, 2
-		time.sleep(5.65) # Wait for song to play
-
 	def PlayGoT(self):
 		# Play whole GoT theme song
 		self.WriteGoT1()
 		self.WriteGoT2()
 		self.WriteGoT3()
-		for i in range(0,4):
-			self.PlayGoT1()
-		for i in range(0,4):
-			self.PlayGoT2()
-		self.PlayGoT3()
-
+		song_repeats = [0,0,0,0,1,1,1,1]
+		# Play GoT1 and GoT2 4 times each
+		for i in song_repeats:
+			self.DirectWrite(141)
+			self.DirectWrite(i)
+			time.sleep(1.15)
+		# Play GoT3 once
+		self.conn.write(b'\x8d\x02') # 141, 2
+		time.sleep(5.65)
 
 
 
