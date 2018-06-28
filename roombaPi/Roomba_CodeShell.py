@@ -77,7 +77,7 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	#print(x) # Include for debugging
 
 # Main Code #
-
+Roomba.PlaySMB()
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
