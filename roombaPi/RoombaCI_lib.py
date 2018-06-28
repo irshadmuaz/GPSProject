@@ -587,36 +587,36 @@ class Create_2:
 	def PlayGoT1(self):
 		# Define GoT Theme song
 		self.conn.write(b'\x8c\x00\x04') # 140, 0, 4
-		self.conn.write(b'\x43\x40\x3c\x40\x3f\x20\x41\x20')
+		self.conn.write(b'\x43\x18\x3c\x18\x3f\x0c\x41\x0c')
 		#					67,  q, 60,  q, 63,  e, 65,  e
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 0
-		time.sleep(3.05) # Wait for song to play
+		time.sleep(1.15) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 2
 		'''
 	def PlayGoT2(self):
 		# Define GoT Theme song
 		self.conn.write(b'\x8c\x00\x04') # 140, 1, 4
-		self.conn.write(b'\x43\x40\x3c\x40\x40\x20\x41\x20')
+		self.conn.write(b'\x43\x18\x3c\x18\x40\x0c\x41\x0c')
 		#					67,  q, 60,  q, 64,  e, 65,  e
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 1
-		time.sleep(3.05) # Wait for song to play
+		time.sleep(1.15) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 3
 		'''
 	def PlayGoT3(self):
 		# Define GoT Theme song
 		self.conn.write(b'\x8c\x00\x06') # 140, 2, 11
-		self.conn.write(b'\x43\xA0\x3c\xA0\x3f\x20\x41\x20\x43\x80\x3c\x80')
+		self.conn.write(b'\x43\x48\x3c\x48\x3f\x0c\x41\x0c\x43\x30\x3c\x30')
 		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 2
-		time.sleep(10.05) # Wait for song to play
+		time.sleep(4.15) # Wait for song to play
 
 ##################################################################
 ## Additional Functions ##
