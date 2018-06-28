@@ -592,7 +592,7 @@ class Create_2:
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 0
-		time.sleep(3) # Wait for song to play
+		time.sleep(6) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 2
 		'''
@@ -604,7 +604,7 @@ class Create_2:
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 1
-		time.sleep(3) # Wait for song to play
+		time.sleep(6) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 3
 		'''
@@ -616,7 +616,7 @@ class Create_2:
 		time.sleep(0.05)
 		# Play song
 		self.conn.write(b'\x8d\x00') # 141, 2
-		time.sleep(10) # Wait for song to play
+		time.sleep(12) # Wait for song to play
 
 ##################################################################
 ## Additional Functions ##
