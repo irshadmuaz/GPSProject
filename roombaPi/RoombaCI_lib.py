@@ -607,7 +607,7 @@ class Create_2:
 
 	def PlayGoT2(self):
 		# Play song
-		self.conn.write(b'\x8d\x00') # 141, 1
+		self.conn.write(b'\x8d\x01') # 141, 1
 		time.sleep(1.15) # Wait for song to play
 
 	''' Game of Thrones Theme Song Part 3
@@ -621,7 +621,7 @@ class Create_2:
 
 	def PlayGoT3(self):
 		# Play song
-		self.conn.write(b'\x8d\x00') # 141, 2
+		self.conn.write(b'\x8d\x02') # 141, 2
 		time.sleep(4.15) # Wait for song to play
 
 
