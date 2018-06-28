@@ -7,7 +7,7 @@ Purpose: Uses Roomba wheel encoders to determine angle and distance
 IMPORTANT: Must be run using Python 3 (python3)
 Made by: Timothy Anglea
 Modified and Appended by: Christopher Brant, David Lynge, and Heath Gerrald
-Last Modified: 6/25/2018
+Last Modified: 6/29/2018
 '''
 ## Import libraries ##
 import serial
