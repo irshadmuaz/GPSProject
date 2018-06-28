@@ -79,9 +79,10 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	'''
 
 # Main Code #
-Roomba.WriteGoT1()
-Roomba.WriteGoT2()
+#Roomba.WriteGoT1()
+#Roomba.WriteGoT2()
 Roomba.WriteGoT3()
+'''
 Roomba.PlayGoT1()
 Roomba.PlayGoT1()
 Roomba.PlayGoT1()
@@ -90,6 +91,7 @@ Roomba.PlayGoT2()
 Roomba.PlayGoT2()
 Roomba.PlayGoT2()
 Roomba.PlayGoT2()
+'''
 Roomba.PlayGoT3()
 
 ## -- Ending Code Starts Here -- ##
