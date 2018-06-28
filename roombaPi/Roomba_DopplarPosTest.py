@@ -137,17 +137,28 @@ while True:
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
 		# Request for the desired angle to turn to
-		x_new = float(input("Desired x-coordinate? "))
-		y_new = float(input("Desired y-coordinate? "))
-		desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
-		desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
-		
-		data_time = 0.0 # 0 seconds initial
-		# Print out initial data point
-		datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts_current, r_counts_current, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
-		# Restart base timers
-		base = time.time()
-		query_base = time.time()
+        # x_new = float(input("Desired x-coordinate? "))
+        # y_new = float(input("Desired y-coordinate? "))
+        # desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
+        # desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
+
+        desired_distance = 0
+        data_time = 0.0 # 0 seconds initial
+        # Print out initial data point
+        datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts_current, r_counts_current, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
+            # Restart base timers
+        base = time.time()
+        query_base = time.time()
+
+        while True:
+            try:
+                desired_heading = float(input("Desired heading?"))
+
+                # Here we will a loop to have it turn until it finds that correct heading
+                # Then when that loop breaks, it again asks for the desired heading in case we need to turn more
+
+            except KeyboardInterrupt:
+                break # Break out of the loop early if something wrong happens
 		
 		while desired_distance > 1: # Until we have reached the location...
 			try:
@@ -185,7 +196,7 @@ while True:
 					y_pos += delta_y_pos
 					
 					# The direction from the current position to the desired position
-					desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
+                    # desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
 					# The distance from the current position to the desired position
 					desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
 					

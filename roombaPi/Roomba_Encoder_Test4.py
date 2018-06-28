@@ -134,8 +134,52 @@ while True:
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
 		# Request for the desired angle to turn to
-		x_new = float(input("Desired x-coordinate? "))
-		y_new = float(input("Desired y-coordinate? "))
+        # x_new = float(input("Desired x-coordinate? "))
+        # y_new = float(input("Desired y-coordinate? "))
+
+        while True:
+            try:
+                desired_heading = float(input("Desired heading?"))
+                Roomba.Move(forward_value, spin_value) # Spin the Roomba toward the desired heading
+                    
+                    if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
+                        bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+                            
+                            # Record the current time since the beginning of loop
+                            data_time = time.time() - base
+                                
+                                # Calculate the count differences and correct for overflow
+                                delta_l_count = (l_counts - l_counts_current)
+                                    if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
+                                        delta_l_count -= pow(2,16)
+                                        if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
+                                            delta_l_count += pow(2,16)
+                                        delta_r_count = (r_counts - r_counts_current)
+                                        if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
+                                            delta_r_count -= pow(2,16)
+                                        if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
+                                            delta_r_count += pow(2,16)
+                                        # Calculated the forward distance traveled since the last counts
+                                        distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
+                                        # Calculated the turn angle change since the last counts
+                                        angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
+                                        distance += distance_change # Updated distance of Roomba
+                                        angle += angle_change # Update angle of Roomba and correct for overflow
+                                        if angle >= 360 or angle < 0:
+                                            angle = (angle % 360) # Normalize the angle value from [0,360)
+                                        # Calculate position data
+                                        delta_x_pos = distance_change * math.cos(math.radians(angle))
+                                        delta_y_pos = distance_change * math.sin(math.radians(angle))
+                                        x_pos += delta_x_pos
+                                        y_pos += delta_y_pos
+                                        
+                                        # The direction from the current position to the desired position
+                                    desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
+            except KeyboardInterrupt:
+                break # Break out of the loop early if something wrong happens
+
+
+        input_distance = float(input("Desired distance?"))
 		desired_heading = (math.degrees(math.atan2((y_new - y_pos),(x_new - x_pos))) % 360)
 		desired_distance = math.sqrt(pow((y_new - y_pos),2) + pow((x_new - x_pos),2))
 		
