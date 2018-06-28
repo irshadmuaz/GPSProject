@@ -624,6 +624,18 @@ class Create_2:
 		self.conn.write(b'\x8d\x02') # 141, 2
 		time.sleep(5.65) # Wait for song to play
 
+	def PlayGoT(self):
+		# Play whole GoT theme song
+		self.WriteGoT1()
+		self.WriteGoT2()
+		self.WriteGoT3()
+		for i in range(0,4):
+			self.PlayGoT1()
+		for i in range(0,4):
+			self.PlayGoT2()
+		self.PlayGoT3()
+
+
 
 
 ##################################################################

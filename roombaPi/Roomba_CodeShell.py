@@ -79,18 +79,8 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	'''
 
 # Main Code #
-Roomba.WriteGoT1()
-Roomba.WriteGoT2()
-Roomba.WriteGoT3()
-Roomba.PlayGoT1()
-Roomba.PlayGoT1()
-Roomba.PlayGoT1()
-Roomba.PlayGoT1()
-Roomba.PlayGoT2()
-Roomba.PlayGoT2()
-Roomba.PlayGoT2()
-Roomba.PlayGoT2()
-Roomba.PlayGoT3()
+Roomba.PlayGoT()
+
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
