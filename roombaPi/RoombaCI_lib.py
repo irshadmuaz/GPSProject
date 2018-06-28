@@ -600,7 +600,7 @@ class Create_2:
 		'''
 	def WriteGoT2(self):
 		# Define GoT Theme song
-		self.conn.write(b'\x8c\x00\x04') # 140, 1, 4
+		self.conn.write(b'\x8c\x01\x04') # 140, 1, 4
 		self.conn.write(b'\x43\x18\x3c\x18\x40\x0c\x41\x0c')
 		#					67,  q, 60,  q, 64,  e, 65,  e
 		time.sleep(0.05)
@@ -614,7 +614,7 @@ class Create_2:
 		'''
 	def WriteGoT3(self):
 		# Define GoT Theme song
-		self.conn.write(b'\x8c\x00\x06') # 140, 2, 11
+		self.conn.write(b'\x8c\x02\x06') # 140, 2, 11
 		self.conn.write(b'\x43\x48\x3c\x48\x3f\x0c\x41\x0c\x43\x30\x3c\x30')
 		#					67, h., 60, h., 63,  e, 65,  e, 67,  h, 60,  h
 		time.sleep(0.05)
