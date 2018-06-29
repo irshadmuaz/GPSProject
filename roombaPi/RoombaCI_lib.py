@@ -636,14 +636,14 @@ class Create_2:
 	def WriteMarioDeath2(self):
 		# Define Death Jingle Part 2
 		self.conn.write(b'\x8c\x01\x0a') # 140, 1, 10
-		self.conn.write(b'\x47\x0c\x4d\x0c\x1e\x0c\x4d\x0c\x4d\x0c\x1e\x0c\x4c\x0c\x1e\x0c\x4a\x0c\x1e\x0c')
+		self.conn.write(b'\x47\x10\x4d\x10\x1e\x08\x4d\x10\x4d\x10\x1e\x08\x4c\x10\x1e\x08\x4a\x10\x1e\x08')
 		#					71,  e, 77,  e, 30,  e, 77,  e, 77,  e, 30,  e, 76,  e, 30,  e, 74,  e, 30,  e
 		time.sleep(0.05)
 
 	def WriteMarioDeath3(self):
 		# Define Death Jingle Part 3
 		self.conn.write(b'\x8c\x02\x05') # 140, 2, 5
-		self.conn.write(b'\x48\x0c\x40\x0c\x1e\x0c\x40\x0c\x3c\x0c')
+		self.conn.write(b'\x48\x10\x40\x10\x1e\x08\x40\x10\x3c\x10')
 		#					72,  e, 64,  e, 30,  e, 64,  e, 60,  e
 		time.sleep(0.05)
 
@@ -659,10 +659,10 @@ class Create_2:
 		time.sleep(0.80)
 		# MarioDeath2
 		self.conn.write(b'\x8d\x01')
-		time.sleep(1.9)
+		time.sleep(2.05)
 		# MarioDeath3
 		self.conn.write(b'\x8d\x02')
-		time.sleep(1)
+		time.sleep(1.15)
 
 
 
