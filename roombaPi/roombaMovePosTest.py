@@ -1,8 +1,10 @@
-''' Roomba_CodeShell.py
+''' roombaMovePosTest.py
 Purpose: Basic code for running Roomba, Xbee, and IMU
 	Sets up Roomba, Xbee, and IMU and calibrates;
 IMPORTANT: Must be run using Python 3 (python3)
-Last Modified: 6/6/2018
+Code Shell for setup written by Timothy Anglea.
+Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
+Last Modified: 6/29/2018
 '''
 ## Import libraries ##
 import serial
@@ -52,7 +54,6 @@ if Roomba.Available() > 0: # If anything is in the Roomba receive buffer
 	#print(x) # Include for debugging
 
 print(" ROOMBA Setup Complete")
-'''
 GPIO.output(yled, GPIO.HIGH) # Indicate within setup sequence
 # Initialize IMU
 print(" Starting IMU...")
@@ -76,16 +77,79 @@ GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
 if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 	x = Xbee.read(Xbee.inWaiting()).decode() # Clear out Xbee input buffer
 	#print(x) # Include for debugging
+
+# Intro Code #
+print("This test is for Roomba Movement exclusively angular and distance-based.")
+print("In this program, you will specify a heading and/or a distance.")
+
 '''
+# Create text file for data storage
+data_name = input("File name for data? ")
+data_name_string = data_name + ".txt" # Add the ".txt" to the end
+datafile = open(data_name_string, "w") # Open a text file for storing data
+# Write data header for the data file; includes name of each column
+datafile.write("This file will contain the given starting GPS coordinates in ECEF.\n")
+datafile.write("Along with calculated final position that the Roomba expects to be located at.\n")
+'''
+
+# Get initial angle from IMU
+angle = imu.CalculateHeading()
+
+#input the speed
+spnspd = 100
+speed_step = 20
+
+#times, spin time is from formula
+spinTime = (WHEEL_SEPARATION * math.pi) / (4 * spnspd)
+backTime = 0.5
+#initializes timers
+moveHelper = (time.time() - (spinTime + backTime))
+
+# Time to query for data
+query_timer = 0.015 # seconds
+# Initial conditions
+distance = 0.0 # total distance travelled (millimeters)
+forward_value = 0 # initial forward speed value (mm/s)
+spin_value = 0 # initial spin speed value (mm/s)
 
 
 # Main Code #
-Roomba.PlayMarioDeath()
+while True:
+	try:
+		# Read in initial wheel count values from Roomba
+		bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+
+		# Print the current angle/position of the Roomba
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	except KeyboardInterrupt:
+		break	# Break out of the loop early if necessary
+
+
+
 
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-#Roomba.PlayGoT()
+Roomba.PlayGoT()
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
