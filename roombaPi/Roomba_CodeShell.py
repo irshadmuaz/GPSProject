@@ -81,7 +81,6 @@ if Xbee.inWaiting() > 0: # If anything is in the Xbee receive buffer
 # Main Code #
 Roomba.PlayGoT()
 
-
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 
