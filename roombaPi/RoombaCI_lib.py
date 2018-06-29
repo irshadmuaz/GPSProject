@@ -636,7 +636,7 @@ class Create_2:
 	def WriteMarioDeath2(self):
 		# Define Death Jingle Part 2
 		self.conn.write(b'\x8c\x01\x09') # 140, 1, 9
-		self.conn.write(b'\x47\x0a\x4d\x0a\x1e\x05\x4d\x0a\x4d\x0a\x1e\x05\x4c\x0a\x1e\x05\x4a\x0a')
+		self.conn.write(b'\x47\x0a\x4d\x0a\x1e\x04\x4d\x0a\x4d\x0a\x1e\x04\x4c\x0a\x1e\x04\x4a\x0a')
 		#					71,  e, 77,  e, 30,  e, 77,  e, 77,  e, 30,  e, 76,  e, 30,  e, 74,  e
 		time.sleep(0.05)
 
@@ -659,10 +659,10 @@ class Create_2:
 		time.sleep(0.4)
 		# MarioDeath2
 		self.conn.write(b'\x8d\x01')
-		time.sleep(1.30)
+		time.sleep(1.1875)
 		# MarioDeath3
 		self.conn.write(b'\x8d\x02')
-		time.sleep(0.55)
+		time.sleep(0.525)
 
 
 
