@@ -112,6 +112,8 @@ distance = 0.0 # total distance travelled (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
 
+# Initialization Music #
+Roomba.PlayGoT()
 
 # Main Code #
 while True:
@@ -149,7 +151,7 @@ while True:
 
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
-Roomba.PlayGoT()
+Roomba.PlayMarioDeath()
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
