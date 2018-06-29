@@ -628,14 +628,14 @@ class Create_2:
 		'''
 	def WriteMarioDeath1(self):
 		# Define Death Jingle Part 1
-		self.conn.write(b'\x8c\x00\x04') # 140, 0, 3
+		self.conn.write(b'\x8c\x00\x03') # 140, 0, 3
 		self.conn.write(b'\x48\x04\x49\x04\x4a\x08')
 		#				    72,  t, 73,  t, 74,  s
 		time.sleep(0.05)
 
 	def WriteMarioDeath2(self):
 		# Define Death Jingle Part 2
-		self.conn.write(b'\x8c\x01\x0a') # 140, 1, 9
+		self.conn.write(b'\x8c\x01\x09') # 140, 1, 9
 		self.conn.write(b'\x47\x0c\x4d\x0c\x1e\x06\x4d\x0c\x4d\x0c\x1e\x06\x4c\x0c\x1e\x06\x4a\x0c')
 		#					71,  e, 77,  e, 30,  e, 77,  e, 77,  e, 30,  e, 76,  e, 30,  e, 74,  e
 		time.sleep(0.05)
