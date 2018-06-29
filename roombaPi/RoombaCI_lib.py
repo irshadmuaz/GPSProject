@@ -659,10 +659,10 @@ class Create_2:
 		time.sleep(0.80)
 		# MarioDeath2
 		self.conn.write(b'\x8d\x01')
-		time.sleep(1.88)
+		time.sleep(1.9)
 		# MarioDeath3
 		self.conn.write(b'\x8d\x02')
-		time.sleep(0.95)
+		time.sleep(1)
 
 
 
