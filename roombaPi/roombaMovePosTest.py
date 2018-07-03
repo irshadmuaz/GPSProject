@@ -212,7 +212,7 @@ while True:
 		distance = 0
 
 		print("\nAngle set.\n")
-		printf("The Roomba will now move the desired distance.\n")
+		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
 		# This while loop is for setting an moving a distance
