@@ -141,14 +141,14 @@ while True:
 		desired_distance = 0
 
 		data_time = 0.0 # 0 seconds initial
-        # Restart base timers
+		# Restart base timers
 		base = time.time()
 		query_base = time.time()
 		# Setting the original spin value.
 		spin_value = DHTurn(angle, desired_heading, epsilon)
 
-        # This while loop is for setting direction
-        while spin_value != 0:
+		# This while loop is for setting direction
+		while spin_value != 0:
 			try:
 				# Have the roomba move to the desired direction to check
 				printf("\nThe Roomba angle will now be changed.\n")
