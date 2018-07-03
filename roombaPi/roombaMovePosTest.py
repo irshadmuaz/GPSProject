@@ -139,7 +139,7 @@ while True:
 		# Request for the desired angle to turn to
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
-		print("Current heading is {0:.3f}", angle)
+		print("Current heading is {0:.3f}".format(angle))
 		desired_heading = float(input("\nDesired heading? "))
 		desired_distance = 0
 
