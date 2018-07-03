@@ -144,7 +144,7 @@ while True:
         # Restart base timers
 		base = time.time()
 		query_base = time.time()
-        # Setting the original spin value.
+		# Setting the original spin value.
 		spin_value = DHTurn(angle, desired_heading, epsilon)
 
         # This while loop is for setting direction
