@@ -123,9 +123,10 @@ moveHelper = (time.time() - (spinTime + backTime))
 query_timer = 0.015 # seconds
 # Initial conditions
 distance = 0.0 # total distance travelled (millimeters)
+x_pos = 0.0 # initial x-direction position (millimeters)
+y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
-
 # Initialization Music #
 Roomba.PlayGoT()
 
