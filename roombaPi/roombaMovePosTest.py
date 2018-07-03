@@ -6,7 +6,6 @@ Code Shell for setup written by Timothy Anglea.
 Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
 Last Modified: 7/3/2018
 '''
-
 ## Import libraries ##
 import serial
 import time
@@ -138,16 +137,16 @@ while True:
 
 		# Request for the desired angle to turn to
 		printf("Beginning location is considered (0,0)\n")
-		desired_heading=float(input("Desired heading?"))
-		desired_distance=0
+		desired_heading = float(input("Desired heading?"))
+		desired_distance = 0
 
 		data_time = 0.0 # 0 seconds initial
         # Restart base timers
-        base = time.time()
-        query_base = time.time()
+		base = time.time()
+		query_base = time.time()
 
         # Setting the original spin value.
-        spin_value = DHTurn(angle, desired_heading, epsilon)
+		spin_value = DHTurn(angle, desired_heading, epsilon)
 
         # This while loop is for setting direction
         while spin_value != 0:
