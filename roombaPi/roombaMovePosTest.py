@@ -136,7 +136,7 @@ while True:
 		bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
 
 		# Request for the desired angle to turn to
-		printf("Beginning location is considered (0,0)\n")
+		print("Beginning location is considered (0,0)\n")
 		desired_heading = float(input("Desired heading?"))
 		desired_distance = 0
 
@@ -151,7 +151,7 @@ while True:
 		while spin_value != 0:
 			try:
 				# Have the roomba move to the desired direction to check
-				printf("\nThe Roomba angle will now be changed.\n")
+				print("\nThe Roomba angle will now be changed.\n")
 				Roomba.Move(forward_value, spin_value) # Spin the Roomba
 
 				# This conditional checks for the new angle and distance changes
@@ -208,7 +208,7 @@ while True:
 		# Reset distance counter
 		distance = 0
 
-		printf("\nAngle set. Checking for distance movement command.\n")
+		print("\nAngle set. Checking for distance movement command.\n")
 		desired_distance=float(input("Desired distance?"))        
 
 		# This while loop is for setting an moving a distance
@@ -273,7 +273,7 @@ while True:
 
         # Stop the Roomba's movement
 		Roomba.Move(0,0)
-		printf("\nRestarting movement process loop.\n")
+		print("\nRestarting movement process loop.\n")
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
