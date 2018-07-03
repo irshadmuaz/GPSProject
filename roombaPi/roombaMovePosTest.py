@@ -193,7 +193,7 @@ while True:
 					spin_value = DHTurn(angle,desired_heading,epsilon)
 
 					# Print out pertinent data values
-					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
+					# print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
 					# Write data values to a text file
 					# datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
 
@@ -260,7 +260,7 @@ while True:
 					forward_value = DDSpeed(angle, desired_heading, to_travel)
 
 					# Print out pertinent data values
-					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, to_travel, angle, y_pos, x_pos))
+					# print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, to_travel, angle, y_pos, x_pos))
 					# Write data values to a text file
 					# datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
 
