@@ -138,7 +138,8 @@ while True:
 
 		# Request for the desired angle to turn to
 		print("Beginning location is considered (0,0)\n")
-		desired_heading = float(input("Desired heading?"))
+		print("Current heading is {0:.3f}\n", angle)
+		desired_heading = float(input("Desired heading? "))
 		desired_distance = 0
 
 		data_time = 0.0 # 0 seconds initial
@@ -210,7 +211,7 @@ while True:
 		distance = 0
 
 		print("\nAngle set. Checking for distance movement command.\n")
-		desired_distance=float(input("Desired distance?"))        
+		desired_distance=float(input("Desired distance? "))        
 
 		# This while loop is for setting an moving a distance
 		while distance < desired_distance:
