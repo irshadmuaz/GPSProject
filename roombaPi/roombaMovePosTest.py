@@ -81,9 +81,9 @@ Roomba.Move(0,0) # Stop Roomba spinning
 time.sleep(0.5)
 imu.CalibrateAccelGyro() # Calculate accelerometer and gyroscope offset values
 # Display offset values
-print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
-print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
-print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
+# print("mx_offset = {:f}; my_offset = {:f}; mz_offset = {:f}".format(imu.mx_offset, imu.my_offset, imu.mz_offset))
+# print("ax_offset = {:f}; ay_offset = {:f}; az_offset = {:f}".format(imu.ax_offset, imu.ay_offset, imu.az_offset))
+# print("gx_offset = {:f}; gy_offset = {:f}; gz_offset = {:f}".format(imu.gx_offset, imu.gy_offset, imu.gz_offset))
 print(" IMU Setup Complete")
 time.sleep(1) # Gives time to read offset values before continuing
 GPIO.output(yled, GPIO.LOW) # Indicate setup sequence is complete
@@ -137,7 +137,8 @@ while True:
 		bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
 
 		# Request for the desired angle to turn to
-		print("Beginning location is considered (0,0)\n")
+		# Print current angle of Roomba
+		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
 		print("Current heading is {0:.3f}\n", angle)
 		desired_heading = float(input("Desired heading? "))
 		desired_distance = 0
@@ -148,12 +149,12 @@ while True:
 		query_base = time.time()
 		# Setting the original spin value.
 		spin_value = DHTurn(angle, desired_heading, epsilon)
+		print("\nThe Roomba angle will now be changed.\n")
 
 		# This while loop is for setting direction
 		while spin_value != 0:
 			try:
 				# Have the roomba move to the desired direction to check
-				print("\nThe Roomba angle will now be changed.\n")
 				Roomba.Move(forward_value, spin_value) # Spin the Roomba
 
 				# This conditional checks for the new angle and distance changes
@@ -210,15 +211,14 @@ while True:
 		# Reset distance counter
 		distance = 0
 
-		print("\nAngle set. Checking for distance movement command.\n")
+		print("\nAngle set.\n")
+		printf("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
 		# This while loop is for setting an moving a distance
 		while distance < desired_distance:
 			try:
 				# Move Roomba to the desired distance
-				printf("\nThe Roomba will now move the desired distance.\n")
-
 				Roomba.Move(forward_value, spin_value) # Spin the Roomba
 
 				# This conditional checks for the new angle and distance changes
