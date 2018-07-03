@@ -35,6 +35,12 @@ TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degre
 
 epsilon = 0.5 # smallest resolution of angle
 
+# GPS/Absolute Positioning Variables #
+# originAbs X,Y,Z are all absolute position points of the origin
+originAbsX = sys.argv[1]
+originAbsY = sys.argv[2]
+originAbsZ = sys.argv[3]
+
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
 	'''
