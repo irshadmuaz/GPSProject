@@ -4,7 +4,7 @@ Purpose: Basic code for running Roomba, Xbee, and IMU
 IMPORTANT: Must be run using Python 3 (python3)
 Code Shell for setup written by Timothy Anglea.
 Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
-Last Modified: 6/29/2018
+Last Modified: 7/3/2018
 '''
 ## Import libraries ##
 import serial
@@ -12,6 +12,11 @@ import time
 import RPi.GPIO as GPIO
 
 import RoombaCI_lib
+from RoombaCI_lib import DHTurn
+from RoombaCI_lib import DDSpeed
+
+import math
+import random
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -20,6 +25,15 @@ Xbee = serial.Serial('/dev/ttyUSB0', 115200) # Baud rate should be 115200
 yled = 5
 rled = 6
 gled = 13
+
+# Roomba Constants
+WHEEL_DIAMETER = 72 # millimeters
+WHEEL_SEPARATION = 235 # millimeters
+WHEEL_COUNTS = 508.8 # counts per revolution
+DISTANCE_CONSTANT = (WHEEL_DIAMETER * math.pi)/(WHEEL_COUNTS) # millimeters/count
+TURN_CONSTANT = (WHEEL_DIAMETER * 180)/(WHEEL_COUNTS * WHEEL_SEPARATION) # degrees/count
+
+epsilon = 0.5 # smallest resolution of angle
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -121,37 +135,155 @@ while True:
 		# Read in initial wheel count values from Roomba
 		bumper_byte, l_counts_current, r_counts_current, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
 
-		# Print the current angle/position of the Roomba
+		# Request for the desired angle to turn to
+		printf("Beginning location is considered (0,0)\n")
+		desired_heading=float(input("Desired heading?"))
+		desired_distance=0
 
+		data_time = 0.0 # 0 seconds initial
+        # Restart base timers
+        base = time.time()
+        query_base = time.time()
 
+        # Setting the original spin value.
+        spin_value = DHTurn(angle, desired_heading, epsilon)
 
+        # This while loop is for setting direction
+        while spin_value != 0:
+        	try:
+        		# Have the roomba move to the desired direction to check
+        		printf("\nThe Roomba angle will now be changed.\n")
+        		Roomba.Move(forward_value, spin_value) # Spin the Roomba
 
+        		# This conditional checks for the new angle and distance changes
+        		if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
+					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+					
+					# Record the current time since the beginning of loop
+					data_time = time.time() - base
+					
+					# Calculate the count differences and correct for overflow
+					delta_l_count = (l_counts - l_counts_current)
+					if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count -= pow(2,16)
+					if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count += pow(2,16)
+					delta_r_count = (r_counts - r_counts_current)
+					if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count -= pow(2,16)
+					if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count += pow(2,16)
+					# Calculated the forward distance traveled since the last counts
+					distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
+					# Calculated the turn angle change since the last counts
+					angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
+					distance += distance_change # Updated distance of Roomba
+					angle += angle_change # Update angle of Roomba and correct for overflow
+					if angle >= 360 or angle < 0:
+						angle = (angle % 360) # Normalize the angle value from [0,360)
+					# Calculate position data
+					delta_x_pos = distance_change * math.cos(math.radians(angle))
+					delta_y_pos = distance_change * math.sin(math.radians(angle))
+					x_pos += delta_x_pos
+					y_pos += delta_y_pos
 
+					# Set the spin value again
+					spin_value = DHTurn(angle,desired_heading,epsilon)
 
+					# Print out pertinent data values
+					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
+					# Write data values to a text file
+					# datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
 
+					# Update current wheel encoder counts
+					l_counts_current = l_counts
+					r_counts_current = r_counts
+					# Reset base for query
+					query_base += query_timer
 
+        	except KeyboardInterrupt:
+        		break  	# Break out of the loop early if necessary
 
+        # Stop the Roomba's movement
+        Roomba.Move(0,0)
+        # Reset distance counter
+        distance = 0
 
+        printf("\nAngle set. Checking for distance movement command.\n")
+		desired_distance=float(input("Desired distance?"))        
 
+        # This while loop is for setting an moving a distance
+        while distance < desired_distance:
+        	try:
+        		# Move Roomba to the desired distance
+        		printf("\nThe Roomba will now move the desired distance.\n")
 
+        		Roomba.Move(forward_value, spin_value) # Spin the Roomba
 
+        		# This conditional checks for the new angle and distance changes
+        		if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
+					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+					
+					# Record the current time since the beginning of loop
+					data_time = time.time() - base
+					
+					# Calculate the count differences and correct for overflow
+					delta_l_count = (l_counts - l_counts_current)
+					if delta_l_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count -= pow(2,16)
+					if delta_l_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_l_count += pow(2,16)
+					delta_r_count = (r_counts - r_counts_current)
+					if delta_r_count > pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count -= pow(2,16)
+					if delta_r_count < -pow(2,15): # 2^15 is somewhat arbitrary
+						delta_r_count += pow(2,16)
+					# Calculated the forward distance traveled since the last counts
+					distance_change = DISTANCE_CONSTANT * (delta_l_count + delta_r_count) * 0.5
+					# Calculated the turn angle change since the last counts
+					angle_change = TURN_CONSTANT * (delta_l_count - delta_r_count)
+					distance += distance_change # Updated distance of Roomba
+					angle += angle_change # Update angle of Roomba and correct for overflow
+					if angle >= 360 or angle < 0:
+						angle = (angle % 360) # Normalize the angle value from [0,360)
+					# Calculate position data
+					delta_x_pos = distance_change * math.cos(math.radians(angle))
+					delta_y_pos = distance_change * math.sin(math.radians(angle))
+					x_pos += delta_x_pos
+					y_pos += delta_y_pos
 
+					# Set the spin value again
+					spin_value = DHTurn(angle,desired_heading,epsilon)
+					# If close, slow down the forward value
+					to_travel = desired_distance - distance
+					forward_value = DDSpeed(angle, desired_heading, to_travel)
 
+					# Print out pertinent data values
+					print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, to_travel, angle, y_pos, x_pos))
+					# Write data values to a text file
+					# datafile.write("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6}, {7}, {8}, {9:.3f}, {10:.3f}, {11:0>8b}, {12:0>8b}\n".format(data_time, distance, desired_distance, angle, desired_heading, l_counts, r_counts, l_speed, r_speed, y_pos, x_pos, bumper_byte, light_bumper))
 
+					# Update current wheel encoder counts
+					l_counts_current = l_counts
+					r_counts_current = r_counts
+					# Reset base for query
+					query_base += query_timer
 
+        	except KeyboardInterrupt:
+        		break  	# Break out of the loop early if necessary
 
-
+        # Stop the Roomba's movement
+        Roomba.Move(0,0)
+        printf("\nRestarting movement process loop.\n")
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
 
-
-
-
-
 ## -- Ending Code Starts Here -- ##
 # Make sure this code runs to end the program cleanly
 Roomba.PlayMarioDeath()
+GPIO.output(gled, GPIO.LOW)
+# datafile.close()
 
 Roomba.ShutDown() # Shutdown Roomba serial connection
 Xbee.close()
