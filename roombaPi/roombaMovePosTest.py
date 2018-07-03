@@ -139,8 +139,8 @@ while True:
 		# Request for the desired angle to turn to
 		# Print current angle of Roomba
 		print("Current Location: ({0:.3f}, {1:.3f})".format(x_pos, y_pos))
-		print("Current heading is {0:.3f}".format(angle))
-		desired_heading = float(input("\nDesired heading? "))
+		print("Current heading is {0:.3f}\n".format(angle))
+		desired_heading = float(input("Desired heading? "))
 		desired_distance = 0
 
 		data_time = 0.0 # 0 seconds initial
@@ -211,7 +211,7 @@ while True:
 		# Reset distance counter
 		distance = 0
 
-		print("\nAngle set.\n")
+		print("Angle set.\n")
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
