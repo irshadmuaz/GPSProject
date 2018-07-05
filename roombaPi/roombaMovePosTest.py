@@ -236,7 +236,7 @@ while True:
 		newLon = lon + dLon * 180 / math.pi
 
 		print("Angle set.\n")
-		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
@@ -308,7 +308,7 @@ while True:
 		newLat = lat + dLat * 180 / math.pi
 		newLon = lon + dLon * 180 / math.pi
 
-		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
