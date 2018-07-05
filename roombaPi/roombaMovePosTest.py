@@ -230,10 +230,10 @@ while True:
 
 		# Calculate new Lat/Lon
 		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(Pi * lat / 180))
+		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * 180 / Pi
-		newLon = lon + dLon * 180 / Pi
+		newLat = lat + dLat * 180 / math.pi
+		newLon = lon + dLon * 180 / math.pi
 
 		print("Angle set.\n")
 		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
@@ -303,10 +303,10 @@ while True:
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
 		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(Pi * lat / 180))
+		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * 180 / Pi
-		newLon = lon + dLon * 180 / Pi
+		newLat = lat + dLat * 180 / math.pi
+		newLon = lon + dLon * 180 / math.pi
 
 		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
 
