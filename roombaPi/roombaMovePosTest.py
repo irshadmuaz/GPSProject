@@ -37,9 +37,19 @@ epsilon = 0.5 # smallest resolution of angle
 
 # GPS/Absolute Positioning Variables #
 # originAbs X,Y,Z are all absolute position points of the origin
+'''
 originAbsX = sys.argv[1]
 originAbsY = sys.argv[2]
 originAbsZ = sys.argv[3]
+'''
+lat = sys.argv[1]
+lon = sys.argv[2]
+
+# Earth's Radius in meters
+earthRad = 6378137
+
+# positive x is north
+# positive y is east
 
 ## Functions and Definitions ##
 ''' Displays current date and time to the screen
@@ -217,7 +227,15 @@ while True:
 		# Reset distance counter
 		distance = 0
 
+		# Calculate new Lat/Lon
+		dLat = y_pos / earthRad
+		dLon = x_pos / (earthRad * Cos(Pi * lat / 180))
+		# OffsetPosition, decimal degrees
+		newLat = lat + dLat * 180 / Pi
+		newLon = lon + dLon * 180 / Pi
+
 		print("Angle set.\n")
+		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
@@ -282,6 +300,14 @@ while True:
         # Stop the Roomba's movement
 		Roomba.Move(0,0)
 		print("\nRestarting movement process loop.\n")
+		# Calculate new Lat/Lon
+		dLat = y_pos / earthRad
+		dLon = x_pos / (earthRad * Cos(Pi * lat / 180))
+		# OffsetPosition, decimal degrees
+		newLat = lat + dLat * 180 / Pi
+		newLon = lon + dLon * 180 / Pi
+
+		print("Current Geodetic Position Lat: {0:.3f}, Lon: {0:.3f}\n".format(newLat, newLon))
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
