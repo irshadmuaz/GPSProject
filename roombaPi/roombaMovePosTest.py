@@ -45,6 +45,7 @@ originAbsZ = sys.argv[3]
 '''
 lat = float(sys.argv[1])
 lon = float(sys.argv[2])
+print("Lat: {0:.6f}, Lon: {0:.6f}".format(lat,lon))
 
 # Earth's Radius in meters
 earthRad = float(6378137)
