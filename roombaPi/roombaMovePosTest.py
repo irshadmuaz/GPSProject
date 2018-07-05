@@ -45,7 +45,6 @@ originAbsZ = sys.argv[3]
 '''
 lat = float(sys.argv[1])
 lon = float(sys.argv[2])
-print(sys.argv[2])
 
 # Earth's Radius in meters
 earthRad = float(6378137)
@@ -147,7 +146,6 @@ forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
 # Initialization Music #
 # Roomba.PlayGoT()
-print("Lat: {0:.6f}, Lon: {0:.6f}".format(lat,lon))
 
 # Main Code #
 while True:
@@ -238,7 +236,7 @@ while True:
 		newLon = lon + (dLon * (180 / math.pi))
 
 		print("Angle set.\n")
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
@@ -310,7 +308,7 @@ while True:
 		newLat = lat + dLat * (180 / math.pi)
 		newLon = lon + dLon * (180 / math.pi)
 
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
