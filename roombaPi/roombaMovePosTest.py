@@ -43,11 +43,11 @@ originAbsX = sys.argv[1]
 originAbsY = sys.argv[2]
 originAbsZ = sys.argv[3]
 '''
-lat = sys.argv[1]
-lon = sys.argv[2]
+lat = float(sys.argv[1])
+lon = float(sys.argv[2])
 
 # Earth's Radius in meters
-earthRad = 6378137
+earthRad = float(6378137)
 
 # positive x is north
 # positive y is east
