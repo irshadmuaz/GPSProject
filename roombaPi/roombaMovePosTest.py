@@ -145,7 +145,8 @@ y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
 # Initialization Music #
-Roomba.PlayGoT()
+# Roomba.PlayGoT()
+print("Lat: {0:.6f}, Lon: {0:.6f}".format(lat,lon))
 
 # Main Code #
 while True:
@@ -232,8 +233,8 @@ while True:
 		dLat = y_pos / earthRad
 		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * 180 / math.pi
-		newLon = lon + dLon * 180 / math.pi
+		newLat = lat + (dLat * (180 / math.pi))
+		newLon = lon + (dLon * (180 / math.pi))
 
 		print("Angle set.\n")
 		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
@@ -305,8 +306,8 @@ while True:
 		dLat = y_pos / earthRad
 		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * 180 / math.pi
-		newLon = lon + dLon * 180 / math.pi
+		newLat = lat + dLat * (180 / math.pi)
+		newLon = lon + dLon * (180 / math.pi)
 
 		print("Current Geodetic Position Lat: {0:.6f}, Lon: {0:.6f}\n".format(newLat, newLon))
 
