@@ -230,7 +230,7 @@ while True:
 
 		# Calculate new Lat/Lon
 		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * Cos(Pi * lat / 180))
+		dLon = x_pos / (earthRad * math.cos(Pi * lat / 180))
 		# OffsetPosition, decimal degrees
 		newLat = lat + dLat * 180 / Pi
 		newLon = lon + dLon * 180 / Pi
@@ -303,7 +303,7 @@ while True:
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
 		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * Cos(Pi * lat / 180))
+		dLon = x_pos / (earthRad * math.cos(Pi * lat / 180))
 		# OffsetPosition, decimal degrees
 		newLat = lat + dLat * 180 / Pi
 		newLon = lon + dLon * 180 / Pi
