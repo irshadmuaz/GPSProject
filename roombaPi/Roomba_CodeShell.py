@@ -40,7 +40,7 @@ GPIO.setup(gled, GPIO.OUT, initial=GPIO.LOW)
 # Wake Up Roomba Sequence
 GPIO.output(gled, GPIO.HIGH) # Turn on green LED to say we are alive
 print(" Starting ROOMBA... ")
-Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 115200)
+Roomba = RoombaCI_lib.Create_2("/dev/ttyS0", 19200)
 Roomba.ddPin = 23 # Set Roomba dd pin number
 GPIO.setup(Roomba.ddPin, GPIO.OUT, initial=GPIO.LOW)
 Roomba.WakeUp(131) # Start up Roomba in Safe Mode
