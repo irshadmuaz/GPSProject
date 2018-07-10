@@ -176,7 +176,7 @@ while True:
 
 				# This conditional checks for the new angle and distance changes
 				if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
-					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+					l_counts, r_counts = Roomba.Query(43, 44) # Read new wheel counts
 
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
@@ -250,7 +250,7 @@ while True:
 
 				# This conditional checks for the new angle and distance changes
 				if (time.time() - query_base) > query_timer: # Every (query_timer) seconds...
-					bumper_byte, l_counts, r_counts, l_speed, r_speed, light_bumper = Roomba.Query(7, 43, 44, 42, 41, 45) # Read new wheel counts
+					l_counts, r_counts = Roomba.Query(43, 44) # Read new wheel counts
 					
 					# Record the current time since the beginning of loop
 					data_time = time.time() - base
