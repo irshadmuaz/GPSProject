@@ -209,6 +209,8 @@ while True:
 					# Set the spin value again
 					spin_value = DHTurn(angle,desired_heading,epsilon)
 
+					print("LCounts:{0:.3f}  RCounts:{1:.3f}\n".format(l_counts, r_counts))
+
 					# Print out pertinent data values
 					# print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
 					# Write data values to a text file
