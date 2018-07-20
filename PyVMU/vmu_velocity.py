@@ -22,7 +22,7 @@ while (calibrate != "y") and (calibrate != "n"):
 	calibrate = string(input("\nEnter y or n if you choose to calibrate the IMU or not: "))
 
 # Run calibration setup	if desired
-if calibrate = "y":
+if calibrate == "y":
 	d = vmu.vmu931("/dev/ttyACM0")
 	d.setup()
 	d.isConnected()
@@ -34,7 +34,7 @@ if calibrate = "y":
 	d.calibrate()
 	d.close()
 	print("\nCalibration finished\n")
-elif calibrate = "n":
+elif calibrate == "n":
 	print("\nCalibration not run\n")
 
 # Declare variables
