@@ -15,10 +15,14 @@ from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
 # Declare variables
+i = 0
 ts_points = []
 x_points = []
 y_points = []
 z_points = []
+x_velocity = 0
+y_velocity = 0
+z_velocity = 0
 
 # Beginning of Parser code
 with VMU931Parser(accelerometer=True) as vp:
@@ -37,3 +41,4 @@ with VMU931Parser(accelerometer=True) as vp:
 			x_points.append(x)
 			y_points.append(y)
 			z_points.append(z)
+			i++
