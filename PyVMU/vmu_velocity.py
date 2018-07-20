@@ -41,8 +41,8 @@ with VMU931Parser(accelerometer=True) as vp:
 			vy = (ay * dt) + vy
 			vz = (az * dt) + vz
 
-			print("X velocity is {0:.3f}\n".format(vx))
-			print("Y velocity is {0:.3f}\n".format(vy))
-			print("Z velocity is {0:.3f}\n".format(vz))
+			print("X velocity is {0:.3f}, X acceleration is {1:.3f}\n".format(vx, ax))
+			#print("Y velocity is {0:.3f}\n".format(vy))
+			#print("Z velocity is {0:.3f}\n".format(vz))
 
 
