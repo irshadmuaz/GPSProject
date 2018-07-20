@@ -4,7 +4,6 @@ import dato
 import serial
 from time import sleep
 import sys
-import rospy
 
 ACCELEROMETERS = "a"
 GYROSCOPES = "g"
@@ -51,11 +50,9 @@ class vmu931():
 				self.serial_dev.open()
 				self.serial_dev.flushInput()
 			except serial.serialutil.SerialException as e:
-				rospy.logerr('vmu931:setup: %s',e)
 				self.connected = False
 				return False
 		
-		rospy.loginfo('vmu931:setup: port %s:%d opened successfully',self.serial_dev.port, self.serial_dev.baudrate)
 		self.connected = True
 		return True
 	
@@ -87,13 +84,10 @@ class vmu931():
 		
 		try:
 			input_bytes = self.serial_dev.inWaiting()
-			#rospy.loginfo('readOneTime 1')
 			if input_bytes<=4:
-				#rospy.logwarn('readOneTime bytes = %d', input_bytes)
 				return -2,''
 			buffer_input = self.serial_dev.read(input_bytes)
 		except IOError as e:
-			rospy.logwarn('vmu931_driver::readOneTime: %s', e)
 			return -5,''
 		dataTypeMessage = False
 		if (ord(buffer_input[0])==2 and ord(buffer_input[len(buffer_input)-1])== 3): #string message
@@ -101,16 +95,14 @@ class vmu931():
 		elif (ord(buffer_input[0])==1 and ord(buffer_input[len(buffer_input)-1])==4): #data message
 			dataTypeMessage = True
 		else:
-			rospy.logwarn('vmu931_driver::readOneTime: unknown data type')
 			'''sizeMessage = ord(buffer_input[1])-4
 			typeMessage = buffer_input[2]
 			dataMessage = buffer_input[3:3+sizeMessage]
-			rospy.logwarn('vmu931_driver::readOneTime: msg =(%s) %s', type(dataMessage),dataMessage)'''
+			'''
 			return -3,''
 		sizeMessage = ord(buffer_input[1])-4
 		typeMessage = buffer_input[2]
 		dataMessage = buffer_input[3:3+sizeMessage]
-		#rospy.loginfo('readOneTime: type %s, size = %d', typeMessage, sizeMessage)
 		#print len(dataMessage)
 		#print len(dataMessage[0:4])
 		if (dataTypeMessage):
@@ -121,7 +113,6 @@ class vmu931():
 				self.value["Accelerometers"].setX(dataMessage[4:8])
 				self.value["Accelerometers"].setY(dataMessage[8:12])
 				self.value["Accelerometers"].setZ(dataMessage[12:16])
-				#rospy.loginfo("readOneTime: accelerometers received!")
 			elif (typeMessage==GYROSCOPES):
 				if (sizeMessage != 16):
 					return -4,''
@@ -129,7 +120,6 @@ class vmu931():
 				self.value["Gyroscopes"].setX(dataMessage[4:8])
 				self.value["Gyroscopes"].setY(dataMessage[8:12])
 				self.value["Gyroscopes"].setZ(dataMessage[12:16])
-				#rospy.loginfo("readOneTime: gyro received!")
 			elif (typeMessage==MAGNETOMETERS):
 				if (sizeMessage != 16):
 					return -4,''
@@ -137,7 +127,6 @@ class vmu931():
 				self.value["Magnetometers"].setX(dataMessage[4:8])
 				self.value["Magnetometers"].setY(dataMessage[8:12])
 				self.value["Magnetometers"].setZ(dataMessage[12:16])
-				#rospy.loginfo("readOneTime: magnetometer received!")
 			elif (typeMessage==EULER_ANGLES):
 				if (sizeMessage != 16):
 					return -4,''
@@ -145,7 +134,6 @@ class vmu931():
 				self.value["Euler"].setX(dataMessage[4:8])
 				self.value["Euler"].setY(dataMessage[8:12])
 				self.value["Euler"].setZ(dataMessage[12:16])
-				#rospy.loginfo("readOneTime: euler received!")
 			elif (typeMessage==QUATERNIONS):
 				if (sizeMessage != 20):
 					return -4,''
@@ -154,27 +142,22 @@ class vmu931():
 				self.value["Quaternions"].setX(dataMessage[8:12])
 				self.value["Quaternions"].setY(dataMessage[12:16])
 				self.value["Quaternions"].setZ(dataMessage[16:20])
-				#rospy.loginfo("readOneTime: quaternions received!")
 			elif (typeMessage==HEADING):
 				if (sizeMessage != 8):
 					return -4,''
 				self.value["Heading"].setTimestam(dataMessage[0:4])
 				self.value["Heading"].setHeading(dataMessage[4:8])
-				#rospy.loginfo("readOneTime: heading received!")
 			elif (typeMessage==STATUS):
 				if (sizeMessage != 7):
 					return -4,''
-				#rospy.loginfo("readOneTime: status received!")
 				self.status.sensorStatus(dataMessage[0])
 				self.status.sensorResolution(dataMessage[1])
 				self.status.outputRate(dataMessage[2])
 				self.status.streaming(dataMessage[3:7])
 			else:
-				rospy.logerr("vmu931_driver::readOneTime: unknown type %s received!", typeMessage)
 				return -4,''
 			return 0,typeMessage
 		else:
-			rospy.loginfo("vmu931_driver::readOneTime: Text from device: {}".format(dataMessage))
 			self.value["Text"].setMsg(dataMessage)
 			return 0,''
 			
@@ -220,7 +203,6 @@ class vmu931():
 				try:
 					self.serial_dev.write(byte_message)
 				except serial.SerialException as e:
-					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
 			elif (mod == "var"+CALIBRATION):
@@ -229,7 +211,6 @@ class vmu931():
 					self.serial_dev.flushInput()
 					self.serial_dev.write(byte_message)
 				except serial.SerialException as e:
-					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
 			elif (mod == "var"+SELF_TEST):
@@ -255,7 +236,6 @@ class vmu931():
 				try:
 					self.serial_dev.write(byte_message)
 				except serial.SerialException as e:
-					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
 		sleep(0.02)
@@ -291,7 +271,6 @@ class vmu931():
 	'''
 	def readStatus(self):
 		if (self.connected):
-			#rospy.loginfo('readStatus')
 			self.sendCommand(STATUS)
 		
 	def __del__(self):
