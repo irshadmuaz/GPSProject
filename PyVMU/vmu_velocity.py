@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ''' vmu_velocity.py
 Purpose: Basic code for reading velocity from VMU931
 IMPORTANT: Must be run using Python 3 (python3)
@@ -21,4 +22,12 @@ with VMU931Parser(accelerometer=True) as vp:
 	while True:
 		pkt = vp.parse()
 
-		
+		if isinstance(pkt, messages.Status):
+			print(pkt)
+
+		if isinstance(pkt, messages.Accelerometer):
+			ts, x, y, z = pkt
+			ts_points.append(ts)
+			x_points.append(x)
+			y_points.append(y)
+			z_points.append(z)
