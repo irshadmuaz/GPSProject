@@ -40,4 +40,9 @@ with VMU931Parser(accelerometer=True) as vp:
 			y_last = y_next
 			z_last = z_next
 			ts_next, x_next, y_next, z_next = pkt
+			dt = ts_next - ts_last
+			dx = x_next - x_last
+			dy = y_next - y_last
+			dz = z_next - z_last
 
+			
