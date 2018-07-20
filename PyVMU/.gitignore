@@ -1,0 +1,8 @@
+*.swp
+*.swo
+*.pyc
+*.ropeproject
+*.idea
+*.DS_Store
+
+docs/build
