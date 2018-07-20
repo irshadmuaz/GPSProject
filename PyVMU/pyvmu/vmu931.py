@@ -10,7 +10,7 @@ class VMU931Parser(object):
     This class is responsible for communicating with and parsing data from the VMU931 inertial measurement unit. 
     """
     def __init__(self,
-                 device="/dev/tty.usbmodem1411",
+                 device="/dev/ttyACM0",
                  accelerometer=False,
                  magnetometer=False,
                  gyroscope=False,
