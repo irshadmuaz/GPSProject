@@ -18,7 +18,7 @@ from pyvmu import messages
 def printValue (val):
 	print("setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg))
 	
-d = vmu.vmu931("/dev/ttyUSB_VMU931")
+d = vmu.vmu931("/dev/ttyACM0")
 d.connectToVMU931()
 d.isConnected()
 d.enableStreamingAccelerometers()
