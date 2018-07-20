@@ -14,6 +14,8 @@ from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
 # Declare variables
+ACCEL_CONSTANT = 9.81	# raw data comes in as G values
+TIME_CONSTANT = 1/1000	# raw data comes in as milliseconds
 ts_next = 0
 ax = 0
 ay = 0
@@ -36,12 +38,15 @@ with VMU931Parser(accelerometer=True) as vp:
 		if isinstance(pkt, messages.Accelerometer):
 			ts_last = ts_next
 			ts_next, ax, ay, az = pkt
-			dt = ts_next - ts_last
-			vx = (ax * dt) + vx
-			vy = (ay * dt) + vy
-			vz = (az * dt) + vz
+			dt = (ts_next - ts_last) * TIME_CONSTANT
+			ax_metric = ax * ACCEL_CONSTANT
+			ay_metric = ay * ACCEL_CONSTANT
+			az_metric = az * ACCEL_CONSTANT
+			vx = (ax_metric * dt) + vx
+			vy = (ay_metric * dt) + vy
+			vz = (az_metric * dt) + vz
 
-			print("X velocity is {0:.3f}, X acceleration is {1:.3f}\n".format(vx, ax))
+			print("Time diff is {0:.3f} s, X acceleration is {1:.3f} m/s\n".format(dt, ax))
 			#print("Y velocity is {0:.3f}\n".format(vy))
 			#print("Z velocity is {0:.3f}\n".format(vz))
 
