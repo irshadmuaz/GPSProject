@@ -14,6 +14,12 @@ import matplotlib.pyplot as pyplot
 from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
+# Declare variables
+ts_points = []
+x_points = []
+y_points = []
+z_points = []
+
 # Beginning of Parser code
 with VMU931Parser(accelerometer=True) as vp:
 
