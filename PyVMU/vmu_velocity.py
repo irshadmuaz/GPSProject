@@ -16,10 +16,10 @@ from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
 # Ask if calibration is desired
-calibrate = string(input("Do you wish to calibrate the IMU? (y/n): "))
+calibrate = str(input("Do you wish to calibrate the IMU? (y/n): "))
 # Data validation
 while (calibrate != "y") and (calibrate != "n"):
-	calibrate = string(input("\nEnter y or n if you choose to calibrate the IMU or not: "))
+	calibrate = str(input("\nEnter y or n if you choose to calibrate the IMU or not: "))
 
 # Run calibration setup	if desired
 if calibrate == "y":
