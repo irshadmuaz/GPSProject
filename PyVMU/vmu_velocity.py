@@ -15,18 +15,27 @@ import vmu931_driver as vmu
 from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
-# Run calibration setup	
-d = vmu.vmu931("/dev/ttyACM0")
-d.setup()
-d.isConnected()
-d.streamingAccelerometers()
-d.streamingGyroscopes()
-d.streamingHeading()
-d.streamingMagnetometers()
-# Now calibrate
-d.calibrate()
-d.close()
-print("\nCalibration finished\n")
+# Ask if calibration is desired
+calibrate = string(input("Do you wish to calibrate the IMU? (y/n): "))
+# Data validation
+while (calibrate != "y") and (calibrate != "n"):
+	calibrate = string(input("\nEnter y or n if you choose to calibrate the IMU or not: "))
+
+# Run calibration setup	if desired
+if calibrate = "y":
+	d = vmu.vmu931("/dev/ttyACM0")
+	d.setup()
+	d.isConnected()
+	d.streamingAccelerometers("Accelerometers")
+	d.streamingGyroscopes("Gyroscopes")
+	d.streamingHeading("Heading")
+	d.streamingMagnetometers("Magnetometers")
+	# Now calibrate
+	d.calibrate()
+	d.close()
+	print("\nCalibration finished\n")
+elif calibrate = "n":
+	print("\nCalibration not run\n")
 
 # Declare variables
 ACCEL_CONSTANT = 9.81	# raw data comes in as G values
