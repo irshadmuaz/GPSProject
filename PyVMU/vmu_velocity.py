@@ -10,8 +10,31 @@ Last Modified: 7/20/2018
 import serial
 import time
 import sys
+import dato
+import vmu931_driver as vmu
 from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
+
+def printValue (val):
+	print "setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg)
+	
+d = vmu.vmu931("/dev/ttyUSB_VMU931")
+d.connectToVMU931()
+d.isConnected()
+d.enableStreamingAccelerometers()
+d.enableStreamingGyroscopes()
+d.enableStreamingQuaternions()
+d.enableStreamingHeading()
+d.enableStreamingEulerAngles()
+d.enableStreamingMagnetometers()
+#for x in range(0,500000):
+#	print x
+#	d.readOneTime()
+d.calibrate()
+for x in range(0,200):
+	print "-------------------------------"
+	d.readOneTime()
+	d.printAllValue()
 
 # Declare variables
 ACCEL_CONSTANT = 9.81	# raw data comes in as G values
