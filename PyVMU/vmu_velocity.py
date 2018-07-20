@@ -48,7 +48,8 @@ with VMU931Parser(accelerometer=True) as vp:
 			vy = (ay_metric * dt) + vy
 			vz = (az_metric * dt) + vz
 
-			print("Time diff is {0:.3f} s, X acceleration is {1:.3f} m/s\n".format(dt, ax_metric))
+			print("X velocity is {0:.3f} m/s, X acceleration is {1:.3f} m/(s^2)\n".format(vx, ax_metric))
+			time.sleep(1)
 			#print("Y velocity is {0:.3f}\n".format(vy))
 			#print("Z velocity is {0:.3f}\n".format(vz))
 
