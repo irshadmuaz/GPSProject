@@ -50,7 +50,7 @@ class vmu931():
 			try:
 				self.serial_dev.open()
 				self.serial_dev.flushInput()
-			except serial.serialutil.SerialException, e:
+			except serial.serialutil.SerialException as e:
 				rospy.logerr('vmu931:setup: %s',e)
 				self.connected = False
 				return False
@@ -92,7 +92,7 @@ class vmu931():
 				#rospy.logwarn('readOneTime bytes = %d', input_bytes)
 				return -2,''
 			buffer_input = self.serial_dev.read(input_bytes)
-		except IOError, e:
+		except IOError as e:
 			rospy.logwarn('vmu931_driver::readOneTime: %s', e)
 			return -5,''
 		dataTypeMessage = False
@@ -219,7 +219,7 @@ class vmu931():
 				self.status.notUpdate()
 				try:
 					self.serial_dev.write(byte_message)
-				except serial.SerialException, e:
+				except serial.SerialException as e:
 					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
@@ -228,7 +228,7 @@ class vmu931():
 				try:
 					self.serial_dev.flushInput()
 					self.serial_dev.write(byte_message)
-				except serial.SerialException, e:
+				except serial.SerialException as e:
 					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
@@ -254,7 +254,7 @@ class vmu931():
 			else:
 				try:
 					self.serial_dev.write(byte_message)
-				except serial.SerialException, e:
+				except serial.SerialException as e:
 					rospy.logerr('vmu931_driver::sendCommand: %s',e)
 					return False
 				
@@ -270,11 +270,11 @@ class vmu931():
 	def printAllValue (self):
 		for key, val in self.value.iteritems():
 			print (key)
-			print "setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg)
+			print("setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg))
 		return
 	
 	def printValue (self, val):
-		print "setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg)
+		print("setTimestam = {} w = {} x = {} y = {} z = {} heading ={} msg ={}".format(val.timestamp, val.w, val.x, val.y, val.z, val.heading, val.msg))
 		return
 	
 	def getStatus (self):
@@ -283,7 +283,7 @@ class vmu931():
 		return copyValue
 	
 	def printStatus (self):
-         print "Status devices: \n mag={} gyro={} acc={} \nResolution: \n gyro={} acc={} \nLow output rate status: {}\nStreaming: \n Head={} Uler={} Mag={} Quart={} Gyro={} Acc={}".format(self.status.magStatus, self.status.gyroStatus, self.status.accStatus, self.status.gyroResolution, self.status.accResolution, self.status.ouptputRate, self.status.streamingHead, self.status.streamingEuler, self.status.streamingMag, self.status.streamingQuart, self.status.streamingGyro, self.status.streamingAcc)
+         print("Status devices: \n mag={} gyro={} acc={} \nResolution: \n gyro={} acc={} \nLow output rate status: {}\nStreaming: \n Head={} Uler={} Mag={} Quart={} Gyro={} Acc={}".format(self.status.magStatus, self.status.gyroStatus, self.status.accStatus, self.status.gyroResolution, self.status.accResolution, self.status.ouptputRate, self.status.streamingHead, self.status.streamingEuler, self.status.streamingMag, self.status.streamingQuart, self.status.streamingGyro, self.status.streamingAcc))
          return
 	
 	'''
