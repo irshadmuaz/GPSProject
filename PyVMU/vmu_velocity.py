@@ -15,11 +15,10 @@ from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
 # Declare variables
-i = 0
-ts_points = []
-x_points = []
-y_points = []
-z_points = []
+ts_next = 0
+x_next = 0
+y_next = 0
+z_next = 0
 x_velocity = 0
 y_velocity = 0
 z_velocity = 0
@@ -36,9 +35,9 @@ with VMU931Parser(accelerometer=True) as vp:
 			print(pkt)
 
 		if isinstance(pkt, messages.Accelerometer):
-			ts, x, y, z = pkt
-			ts_points.append(ts)
-			x_points.append(x)
-			y_points.append(y)
-			z_points.append(z)
-			i++
+			ts_last = ts_next
+			x_last = x_next
+			y_last = y_next
+			z_last = z_next
+			ts_next, x_next, y_next, z_next = pkt
+
