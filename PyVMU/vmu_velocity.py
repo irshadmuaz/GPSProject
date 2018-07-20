@@ -10,7 +10,6 @@ Last Modified: 7/20/2018
 import serial
 import time
 import sys
-import matplotlib.pyplot as pyplot
 from pyvmu.vmu931 import VMU931Parser
 from pyvmu import messages
 
