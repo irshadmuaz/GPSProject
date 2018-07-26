@@ -6,10 +6,7 @@ Code Shell for setup written by Timothy Anglea.
 Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
 Last Modified: 7/3/2018
 '''
-## Import libraries ##
-import serial
-import time
-import sys
+
 import RPi.GPIO as GPIO
 
 import RoombaCI_lib
@@ -209,7 +206,7 @@ while True:
 					# Set the spin value again
 					spin_value = DHTurn(angle,desired_heading,epsilon)
 
-					print("LCounts:{0:.3f}  RCounts:{1:.3f}\n".format(l_counts, r_counts))
+					# print("LCounts:{0:.3f}  RCounts:{1:.3f}\n".format(l_counts, r_counts))
 
 					# Print out pertinent data values
 					# print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
@@ -231,8 +228,8 @@ while True:
 		distance = 0
 
 		# Calculate new Lat/Lon
-		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
+		dLat = (y_pos / earthRad) / 1000
+		dLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180))) / 1000
 		# OffsetPosition, decimal degrees
 		newLat = lat + (dLat * (180 / math.pi))
 		newLon = lon + (dLon * (180 / math.pi))
@@ -304,8 +301,8 @@ while True:
 		Roomba.Move(0,0)
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
-		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
+		dLat = (y_pos / earthRad) / 1000
+		dLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180))) / 1000
 		# OffsetPosition, decimal degrees
 		newLat = lat + dLat * (180 / math.pi)
 		newLon = lon + dLon * (180 / math.pi)
