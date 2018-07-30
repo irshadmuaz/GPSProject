@@ -132,7 +132,6 @@ spinTime = (WHEEL_SEPARATION * math.pi) / (4 * spnspd)
 backTime = 0.5
 #initializes timers
 moveHelper = (time.time() - (spinTime + backTime))
-
 # Time to query for data
 query_timer = 0.015 # seconds
 # Initial conditions
@@ -141,6 +140,8 @@ x_pos = 0.0 # initial x-direction position (millimeters)
 y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
+newLat = 0
+newLon = 0
 # Initialization Music #
 # Roomba.PlayGoT()
 
@@ -228,8 +229,11 @@ while True:
 		distance = 0
 
 		# Calculate new Lat/Lon
-		dLat = (y_pos / earthRad) / 1000
-		dLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180))) / 1000
+		nLat = (y_pos / earthRad)
+		nLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180)))
+		# Calculate difference in Lat/Lon
+		dLat = nLat - newLat
+		dLon = nLon - newLon
 		# OffsetPosition, decimal degrees
 		newLat = lat + (dLat * (180 / math.pi))
 		newLon = lon + (dLon * (180 / math.pi))
@@ -301,11 +305,14 @@ while True:
 		Roomba.Move(0,0)
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
-		dLat = (y_pos / earthRad) / 1000
-		dLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180))) / 1000
+		nLat = (y_pos / earthRad)
+		nLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180)))
+		# Calculate difference in Lat/Lon
+		dLat = nLat - newLat
+		dLon = nLon - newLon
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * (180 / math.pi)
-		newLon = lon + dLon * (180 / math.pi)
+		newLat = lat + (dLat * (180 / math.pi))
+		newLon = lon + (dLon * (180 / math.pi))
 
 		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
 
