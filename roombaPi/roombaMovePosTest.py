@@ -12,9 +12,11 @@ import RPi.GPIO as GPIO
 import RoombaCI_lib
 from RoombaCI_lib import DHTurn
 from RoombaCI_lib import DDSpeed
-
+import serial
 import math
 import random
+import sys
+import time
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -229,17 +231,16 @@ while True:
 		distance = 0
 
 		# Calculate new Lat/Lon
-		nLat = (y_pos / earthRad)
-		nLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180)))
-		# Calculate difference in Lat/Lon
-		dLat = nLat - newLat
-		dLon = nLon - newLon
+		dLat = ((y_pos / 1000) / earthRad)
+		dLon = ((x_pos / 1000) / (earthRad * math.cos(math.pi * lat / 180)))
 		# OffsetPosition, decimal degrees
-		newLat = lat + (dLat * (180 / math.pi))
-		newLon = lon + (dLon * (180 / math.pi))
+		newLat = lat + dLat
+		newLon = lon + dLon
+		#newLat = lat + (dLat * (180 / math.pi))
+		#newLon = lon + (dLon * (180 / math.pi))
 
 		print("Angle set.\n")
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.9f}, Lon: {1:.9f}\n".format(newLat, newLon))
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
@@ -305,16 +306,15 @@ while True:
 		Roomba.Move(0,0)
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
-		nLat = (y_pos / earthRad)
-		nLon = (x_pos / (earthRad * math.cos(math.pi * lat / 180)))
-		# Calculate difference in Lat/Lon
-		dLat = nLat - newLat
-		dLon = nLon - newLon
+		dLat = ((y_pos / 1000) / earthRad)
+		dLon = ((x_pos / 1000) / (earthRad * math.cos(math.pi * lat / 180)))
 		# OffsetPosition, decimal degrees
-		newLat = lat + (dLat * (180 / math.pi))
-		newLon = lon + (dLon * (180 / math.pi))
+		newLat = lat + dLat
+		newLon = lon + dLon
+		#newLat = lat + (dLat * (180 / math.pi))
+		#newLon = lon + (dLon * (180 / math.pi))
 
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.9f}, Lon: {1:.9f}\n".format(newLat, newLon))
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
