@@ -4,7 +4,7 @@ Purpose: Basic code for running Roomba, Xbee, and IMU
 IMPORTANT: Must be run using Python 3 (python3)
 Code Shell for setup written by Timothy Anglea.
 Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
-Last Modified: 7/3/2018
+Last Modified: 7/30/2018
 '''
 
 import RPi.GPIO as GPIO
