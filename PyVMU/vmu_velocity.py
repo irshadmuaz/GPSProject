@@ -59,22 +59,22 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 
 			# Calculate all 3 matrices before multiplying them together
 			# Calculate D matrix with x value of eulers angles
-			d_11 = math.cos(-ex)
-			d_12 = math.sin(-ex)
-			d_21 = -(math.sin(-ex))
-			d_22 = math.cos(-ex)
+			d_11 = math.cos(math.radians(ex))
+			d_12 = math.sin(math.radians(ex))
+			d_21 = -(math.sin(math.radians(ex)))
+			d_22 = math.cos(math.radians(ex))
 			d_matrix = np.matrix([[d_11, d_12, 0], [d_21, d_22, 0],[0, 0, 1]])
 			# Calculate C matrix with y value of eulers angles
-			c_22 = math.cos(-ey)
-			c_23 = math.sin(-ey)
-			c_32 = -(math.sin(-ey))
-			c_33 = math.cos(-ey)
+			c_22 = math.cos(math.radians(ey))
+			c_23 = math.sin(math.radians(ey))
+			c_32 = -(math.sin(math.radians(ey)))
+			c_33 = math.cos(math.radians(ey))
 			c_matrix = np.matrix([[1, 0, 0],[0, c_22, c_23],[0, c_32, c_33]])
 			# Calculate B matrix with z value of eulers angles
-			b_11 = math.cos(-ez)
-			b_12 = math.sin(-ez)
-			b_21 = -(math.sin(-ez))
-			b_22 = math.cos(-ez)
+			b_11 = math.cos(math.radians(ez))
+			b_12 = math.sin(math.radians(ez))
+			b_21 = -(math.sin(math.radians(ez)))
+			b_22 = math.cos(math.radians(ez))
 			b_matrix = np.matrix([[b_11, b_12, 0], [b_21, b_22, 0],[0, 0, 1]])
 
 			rot_matrix = b_matrix * c_matrix * d_matrix
@@ -88,8 +88,8 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		new_accel_matrix = rot_by_accel + grav_matrix
 
 		print("\n")
-		print("Euler Angles: X:{0:0.3f},Y:{1:0.3f},Z{2:0.3f}\n".format(ex,ey,ez))
-		print(accel_matrix)
+		#print("Euler Angles: X:{0:0.3f},Y:{1:0.3f},Z{2:0.3f}\n".format(ex,ey,ez))
+		print(new_accel_matrix)
 		print("\n")
 
 		# Calculate acceleration and velocity here based on the new ax,ay,az values
