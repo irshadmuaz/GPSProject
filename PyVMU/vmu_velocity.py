@@ -25,9 +25,10 @@ az = 0
 vx = 0
 vy = 0
 vz = 0
+ts
 
 # Beginning of Parser code
-with VMU931Parser(accelerometer=True) as vp:
+with VMU931Parser(accelerometer=True, euler=True) as vp:
 
 	vp.set_accelerometer_resolution(16) # Set resolution of accelerometer to 8g
 
@@ -40,17 +41,20 @@ with VMU931Parser(accelerometer=True) as vp:
 		if isinstance(pkt, messages.Accelerometer):
 			ts_last = ts_next
 			ts_next, ax, ay, az = pkt
-			dt = (ts_next - ts_last) * TIME_CONSTANT
-			ax_metric = ax * ACCEL_CONSTANT
-			ay_metric = ay * ACCEL_CONSTANT
-			az_metric = az * ACCEL_CONSTANT
-			vx = (ax_metric * dt) + vx
-			vy = (ay_metric * dt) + vy
-			vz = (az_metric * dt) + vz
 
-			print("X velocity is {0:.3f} m/s, X acceleration is {1:.3f} m/(s^2)\n".format(vx, ax_metric))
-			time.sleep(1)
-			#print("Y velocity is {0:.3f}\n".format(vy))
-			#print("Z velocity is {0:.3f}\n".format(vz))
+		if isinstance(pkt, messages.Euler):
+			ets, ex, ey, ez = pkt
+
+
+
+		# Calculate acceleration and velocity here based on the new ax,ay,az values
+		dt = (ts_next - ts_last) * TIME_CONSTANT
+		ax_metric = ax * ACCEL_CONSTANT
+		ay_metric = ay * ACCEL_CONSTANT
+		az_metric = az * ACCEL_CONSTANT
+		vx = (ax_metric * dt) + vx
+		vy = (ay_metric * dt) + vy
+		vz = (az_metric * dt) + vz
+
 
 
