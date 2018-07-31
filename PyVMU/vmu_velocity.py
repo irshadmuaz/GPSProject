@@ -72,11 +72,11 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
             theta[1] *= 0.0174533
             theta[2] *= 0.0174533
 
-            acc_in[0] = ACCEL_CONSTANT * acc_bod[0]
-            acc_in[1] = ACCEL_CONSTANT * acc_bod[1]
-            acc_in[2] = ACCEL_CONSTANT * acc_bod[2]
+            acc_bod[0] *= ACCEL_CONSTANT
+            acc_bod[1] *= ACCEL_CONSTANT
+            acc_bod[2] *= ACCEL_CONSTANT
 
-            acc_inertial = np.dot(eulerAnglesToRotationMatrix(theta), acc)
+            acc_inertial = np.dot(eulerAnglesToRotationMatrix(theta), acc_bod)
             acc_inertial[2] -= ACCEL_CONSTANT
             print("Acceleration in X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(acc_inertial[0],acc_inertial[1],acc_inertial[2]))
 
