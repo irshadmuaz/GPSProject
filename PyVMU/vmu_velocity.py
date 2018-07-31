@@ -27,6 +27,8 @@ az = 0
 vx = 0
 vy = 0
 vz = 0
+rot_matrix = np.matrix([0,0,0],[0,0,0],[0,0,0])
+accel_matrix = np.matrix([0],[0],[0])
 
 # Beginning of Parser code
 with VMU931Parser(accelerometer=True, euler=True) as vp:
@@ -43,33 +45,33 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 			ts_last = ts_next
 			ts_next, ax, ay, az = pkt
 
+			# value of acceleration measured
+			accel_matrix = np.matrix([ax],[ay],[az])
+
 		if isinstance(pkt, messages.Euler):
 			ets, ex, ey, ez = pkt
 
-		# Calculate all 3 matrices before multiplying them together
-		# Calculate D matrix with x value of eulers angles
-		rx_22 = math.cos(ex)
-		rx_23 = -(math.sin(ex))
-		rx_32 = math.sin(ex)
-		rx_33 = math.cos(ex)
-		rx_matrix = np.matrix([1, 0, 0], [0, rx_22, rx_23],[0, rx_32, rx_33])
-		# Calculate C matrix with y value of eulers angles
-		ry_11 = math.cos(ey)
-		ry_13 = math.sin(ey)
-		ry_31 = -(math.sin(ey))
-		ry_33 = math.cos(ey)
-		ry_matrix = np.matrix([ry_11, 0, ry_13],[0, 1, 0],[ry_31, 0, ry_33])
-		# Calculate B matrix with z value of eulers angles
-		rz_11 = math.cos(ez)
-		rz_12 = -(math.sin(ez))
-		rz_21 = math.sin(ez)
-		rz_22 = math.cos(ez)
-		rz_matrix = np.matrix([rz_11, rz_12, 0], [rz_21, rz_22, 0],[0, 0, 1])
+			# Calculate all 3 matrices before multiplying them together
+			# Calculate D matrix with x value of eulers angles
+			rx_22 = math.cos(ex)
+			rx_23 = -(math.sin(ex))
+			rx_32 = math.sin(ex)
+			rx_33 = math.cos(ex)
+			rx_matrix = np.matrix([1, 0, 0], [0, rx_22, rx_23],[0, rx_32, rx_33])
+			# Calculate C matrix with y value of eulers angles
+			ry_11 = math.cos(ey)
+			ry_13 = math.sin(ey)
+			ry_31 = -(math.sin(ey))
+			ry_33 = math.cos(ey)
+			ry_matrix = np.matrix([ry_11, 0, ry_13],[0, 1, 0],[ry_31, 0, ry_33])
+			# Calculate B matrix with z value of eulers angles
+			rz_11 = math.cos(ez)
+			rz_12 = -(math.sin(ez))
+			rz_21 = math.sin(ez)
+			rz_22 = math.cos(ez)
+			rz_matrix = np.matrix([rz_11, rz_12, 0], [rz_21, rz_22, 0],[0, 0, 1])
 
-		rot_matrix = rz_matrix * ry_matrix * rx_matrix
-
-		# value of acceleration measured
-		accel_matrix = np.matrix([ax],[ay],[az])
+			rot_matrix = rz_matrix * ry_matrix * rx_matrix
 
 		# gravitational matrix to add 
 		grav_matrix = np.matrix([0],[0],[1])
