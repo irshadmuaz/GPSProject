@@ -21,12 +21,8 @@ from pyvmu import messages
 ACCEL_CONSTANT = 9.81	# raw data comes in as G values
 TIME_CONSTANT = 1/1000	# raw data comes in as milliseconds
 ts_next = 0
-acc_bod[0] = 0
-acc_bod[1] = 0
-acc_bod[2] = 0
-velo[0] = 0
-velo[1] = 0
-velo[2] = 0
+acc_bod = np.array([0,0,0])
+velo = np.array([0,0,0])
 
 # Calculates Rotation Matrix given euler angles.
 def eulerAnglesToRotationMatrix(theta) :
