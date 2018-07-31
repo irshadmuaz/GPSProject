@@ -64,10 +64,11 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 			print(pkt)
 
 		if isinstance(pkt, messages.Accelerometer):
-			ts_last = ts_next
+			#ts_last = ts_next
 			ts_next, acc_bod[0], acc_bod[1], acc_bod[2] = pkt
 
 		if isinstance(pkt, messages.Euler):
+			ts_last = ts_next
 			ts_next, theta[0], theta[1], theta[2] = pkt
 
 			theta[0] *= 0.0174533
