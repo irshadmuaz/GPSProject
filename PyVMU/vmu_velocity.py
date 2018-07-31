@@ -7,6 +7,8 @@ Last Modified: 7/20/2018
 '''
 
 ## Import Libraries ##
+import numpy
+import math
 import serial
 import time
 import sys
@@ -25,7 +27,6 @@ az = 0
 vx = 0
 vy = 0
 vz = 0
-ts
 
 # Beginning of Parser code
 with VMU931Parser(accelerometer=True, euler=True) as vp:
