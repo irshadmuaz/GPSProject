@@ -64,7 +64,7 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 
 		if isinstance(pkt, messages.Accelerometer):
 			#ts_last = ts_next
-			ts_next, acc_bod[0], acc_bod[1], acc_bod[2] = pkt
+			ts_okay, acc_bod[0], acc_bod[1], acc_bod[2] = pkt
 
 		if isinstance(pkt, messages.Euler):
 			ts_last = ts_next
@@ -88,5 +88,5 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 			velo[1] = (acc_inertial[1] * dt) + velo[1]
 			velo[2] = (acc_inertial[2] * dt) + velo[2]
 			#print("Velocity in m/s X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(velo[0],velo[1],velo[2]))
-			print(dt, ts_next, ts_last)
+			print(dt, ts_next, ts_last, ts_okay)
 
