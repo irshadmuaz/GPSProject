@@ -85,7 +85,7 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		rot_by_accel = rot_matrix * accel_matrix
 
 		# Cancel out gravity
-		new_accel_matrix = rot_by_accel + grav_matrix
+		new_accel_matrix = rot_by_accel - grav_matrix
 
 		print("\n")
 		#print("Euler Angles: X:{0:0.3f},Y:{1:0.3f},Z{2:0.3f}\n".format(ex,ey,ez))
