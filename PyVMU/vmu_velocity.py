@@ -79,6 +79,8 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		# Cancel out gravity
 		new_accel_matrix = rot_by_accel + grav_matrix
 
+		print(new_accel_matrix)
+
 		# Calculate acceleration and velocity here based on the new ax,ay,az values
 		#dt = (ts_next - ts_last) * TIME_CONSTANT
 		#ax_metric = ax * ACCEL_CONSTANT
