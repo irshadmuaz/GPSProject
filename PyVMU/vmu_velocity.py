@@ -29,6 +29,9 @@ vy = 0
 vz = 0
 rot_matrix = np.matrix([[0,0,0],[0,0,0],[0,0,0]])
 accel_matrix = np.matrix([[0],[0],[0]])
+ex = 0
+ey = 0
+ez = 0
 
 # Beginning of Parser code
 with VMU931Parser(accelerometer=True, euler=True) as vp:
