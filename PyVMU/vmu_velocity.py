@@ -68,7 +68,6 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 			ts_next, acc_bod[0], acc_bod[1], acc_bod[2] = pkt
 
 		if isinstance(pkt, messages.Euler):
-			ts_last = ts_next
 			ts_next, theta[0], theta[1], theta[2] = pkt
 
 			theta[0] *= 0.0174533
@@ -81,13 +80,13 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 
 			acc_inertial = np.dot(eulerAnglesToRotationMatrix(theta), acc_bod)
 			acc_inertial[2] -= ACCEL_CONSTANT
-			print("Acceleration in X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(acc_inertial[0],acc_inertial[1],acc_inertial[2]))
+			#print("Acceleration m/s^2 in X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(acc_inertial[0],acc_inertial[1],acc_inertial[2]))
 
 			# Calculate acceleration and velocity here based on the new ax,ay,az values
 			dt = (ts_next - ts_last) * TIME_CONSTANT
 			velo[0] = (acc_inertial[0] * dt) + velo[0]
 			velo[1] = (acc_inertial[1] * dt) + velo[1]
 			velo[2] = (acc_inertial[2] * dt) + velo[2]
-
+			print("Velocity in m/s X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(velo[0],velo[1],velo[2]))
 
 
