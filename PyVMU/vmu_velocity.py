@@ -20,8 +20,7 @@ from pyvmu import messages
 # Declare variables
 ACCEL_CONSTANT = 9.81	# raw data comes in as G values
 TIME_CONSTANT = 1/1000	# raw data comes in as milliseconds
-ts_next = 0
-acc_bod = np.array([0,0,0])
+acc = np.array([0,0,0])
 velo = np.array([0,0,0])
 
 # Calculates Rotation Matrix given euler angles.
@@ -51,6 +50,7 @@ theta = [-178.761, 87.207, -29.288]
 
 acc_bod = [-10.019, -0.21, -0.49]
 
+has_ran = 0
 
 with VMU931Parser(euler=True, accelerometer=True) as vp:
 
@@ -64,32 +64,28 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 
 		if isinstance(pkt, messages.Accelerometer):
 			#ts_last = ts_next
-			ts_okay, acc_bod[0], acc_bod[1], acc_bod[2] = pkt
+			ts_okay, acc[0], acc[1], acc[2] = pkt
 
-		if isinstance(pkt, messages.Euler):
-			ts_last = ts_next
-			ts_next, theta[0], theta[1], theta[2] = pkt
+		        if isinstance(pkt, messages.Euler):
+            if has_ran == 1:
+                ts_old = ts_euler
+            ts_euler, theta[0], theta[1], theta[2] = pkt
+            if has_ran == 1:
+                ts_diff = (ts_euler - ts_old) / 1000
 
-			theta[0] *= 0.0174533
-			theta[1] *= 0.0174533
-			theta[2] *= 0.0174533
+                theta[0] *= 0.0174533
+                theta[1] *= 0.0174533
+                theta[2] *= 0.0174533
 
-			acc_bod[0] *= ACCEL_CONSTANT
-			acc_bod[1] *= ACCEL_CONSTANT
-			acc_bod[2] *= ACCEL_CONSTANT
+                acc[0] *= 9.81
+                acc[1] *= 9.81
+                acc[2] *= 9.81
 
-			acc_inertial = np.dot(eulerAnglesToRotationMatrix(theta), acc_bod)
-			acc_inertial[2] -= ACCEL_CONSTANT
-			#print("Acceleration m/s^2 in X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(acc_inertial[0],acc_inertial[1],acc_inertial[2]))
+                acc_i = np.dot(eulerAnglesToRotationMatrix(theta), acc)
+                acc_i[2] -= 9.81
 
-			# Calculate acceleration and velocity here based on the new ax,ay,az values
-			dt = (ts_next - ts_last) * TIME_CONSTANT
-			velo[0] += (acc_inertial[0] * dt)
-			velo[1] += (acc_inertial[1] * dt)
-			velo[2] += (acc_inertial[2] * dt)
-			print("\n")
-			print("Velocity m/s in X:{0:0.6f},Y:{1:0.6f},Z:{2:0.6f}".format(velo[0],velo[1],velo[2]))
-			print(dt, ts_next, ts_last)
-			print("\n")
+                velo[0] += ts_diff * acc_i[0]
+                velo[1] += ts_diff * acc_i[1]
+                velo[2] += ts_diff * acc_i[2]
 
-
+            has_ran = 1
