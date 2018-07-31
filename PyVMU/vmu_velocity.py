@@ -68,7 +68,7 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 
 		if isinstance(pkt, messages.Euler):
 			ts_last = ts_next
-			ts_okay, theta[0], theta[1], theta[2] = pkt
+			ts_next, theta[0], theta[1], theta[2] = pkt
 
 			theta[0] *= 0.0174533
 			theta[1] *= 0.0174533
