@@ -85,7 +85,8 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		new_accel_matrix = rot_by_accel + grav_matrix
 
 		print("\n")
-		print(new_accel_matrix)
+		print("Euler Angles: X:{0:0.3f},Y:{1:0.3f},Z{2:0.3f}\n".format(ex,ey,ez))
+		print(accel_matrix)
 		print("\n")
 
 		# Calculate acceleration and velocity here based on the new ax,ay,az values
