@@ -55,9 +55,10 @@ def eulerAnglesToRotationMatrix(theta) :
  
 	return R
 
+# Hardcoded values are necessary
 theta = [-178.761, 87.207, -29.288]
 
-acc = [-10.019, -0.21, -0.49]
+acc_bod = [-10.019, -0.21, -0.49]
 
 
 with VMU931Parser(euler=True, accelerometer=True) as vp:
