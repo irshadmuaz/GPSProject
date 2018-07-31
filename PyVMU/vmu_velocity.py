@@ -44,9 +44,12 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		if isinstance(pkt, messages.Accelerometer):
 			ts_last = ts_next
 			ts_next, ax, ay, az = pkt
+			ax_metric = ax * ACCEL_CONSTANT
+			ay_metric = ay * ACCEL_CONSTANT
+			az_metric = az * ACCEL_CONSTANT
 
 			# value of acceleration measured
-			accel_matrix = np.matrix([[ax],[ay],[az]])
+			accel_matrix = np.matrix([[ax_metric],[ay_metric],[az_metric]])
 
 		if isinstance(pkt, messages.Euler):
 			ets, ex, ey, ez = pkt
@@ -74,7 +77,7 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 			rot_matrix = rz_matrix * ry_matrix * rx_matrix
 
 		# gravitational matrix to add 
-		grav_matrix = np.matrix([[0],[0],[0]])
+		grav_matrix = np.matrix([[0],[0],[ACCEL_CONSTANT]])
 
 		rot_by_accel = rot_matrix * accel_matrix
 
@@ -82,7 +85,7 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 		new_accel_matrix = rot_by_accel + grav_matrix
 
 		print("\n")
-		print(accel_matrix)
+		print(new_accel_matrix)
 		print("\n")
 
 		# Calculate acceleration and velocity here based on the new ax,ay,az values
