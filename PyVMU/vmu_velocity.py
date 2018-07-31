@@ -20,7 +20,6 @@ from pyvmu import messages
 # Declare variables
 ACCEL_CONSTANT = 9.81	# raw data comes in as G values
 TIME_CONSTANT = 1/1000	# raw data comes in as milliseconds
-ts_last = 0
 ts_next = 0
 acc_bod = np.array([0,0,0])
 velo = np.array([0,0,0])
