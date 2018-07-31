@@ -72,7 +72,7 @@ with VMU931Parser(accelerometer=True, euler=True) as vp:
 			rz_matrix = np.matrix([[rz_11, rz_12, 0], [rz_21, rz_22, 0],[0, 0, 1]])
 
 			rot_matrix = rz_matrix * ry_matrix * rx_matrix
-			rot_matrix = np.matrix.I(rot_matrix)
+			rot_matrix = np.matrix.I()
 
 		# gravitational matrix to add 
 		grav_matrix = np.matrix([[0],[0],[1]])
