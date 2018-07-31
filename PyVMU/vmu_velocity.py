@@ -87,7 +87,8 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 			velo[0] += (acc_inertial[0] * dt)
 			velo[1] += (acc_inertial[1] * dt)
 			velo[2] += (acc_inertial[2] * dt)
-			print(velo)
 			print("\n")
 			print(dt, ts_next, ts_last)
+			print("\n")
+
 
