@@ -87,6 +87,6 @@ with VMU931Parser(euler=True, accelerometer=True) as vp:
 			velo[0] += (acc_inertial[0] * dt)
 			velo[1] += (acc_inertial[1] * dt)
 			velo[2] += (acc_inertial[2] * dt)
-			#print("Velocity in m/s X:{0:0.3f},Y:{1:0.3f},Z:{2:0.3f}".format(velo[0],velo[1],velo[2]))
+			print("\nVelocity in m/s X:{0:0.6f},Y:{1:0.6f},Z:{2:0.6f}\n".format(velo[0],velo[1],velo[2]))
 			print(dt, ts_next, ts_last)
 
