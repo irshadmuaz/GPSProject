@@ -4,20 +4,19 @@ Purpose: Basic code for running Roomba, Xbee, and IMU
 IMPORTANT: Must be run using Python 3 (python3)
 Code Shell for setup written by Timothy Anglea.
 Author of Main Code: Christopher Brant, assisted by Timothy Anglea.
-Last Modified: 7/3/2018
+Last Modified: 7/30/2018
 '''
-## Import libraries ##
-import serial
-import time
-import sys
+
 import RPi.GPIO as GPIO
 
 import RoombaCI_lib
 from RoombaCI_lib import DHTurn
 from RoombaCI_lib import DDSpeed
-
+import serial
 import math
 import random
+import sys
+import time
 
 ## Variables and Constants ##
 global Xbee # Specifies connection to Xbee
@@ -135,7 +134,6 @@ spinTime = (WHEEL_SEPARATION * math.pi) / (4 * spnspd)
 backTime = 0.5
 #initializes timers
 moveHelper = (time.time() - (spinTime + backTime))
-
 # Time to query for data
 query_timer = 0.015 # seconds
 # Initial conditions
@@ -144,6 +142,8 @@ x_pos = 0.0 # initial x-direction position (millimeters)
 y_pos = 0.0 # initial y-direction position (millimeters)
 forward_value = 0 # initial forward speed value (mm/s)
 spin_value = 0 # initial spin speed value (mm/s)
+newLat = 0
+newLon = 0
 # Initialization Music #
 # Roomba.PlayGoT()
 
@@ -209,7 +209,7 @@ while True:
 					# Set the spin value again
 					spin_value = DHTurn(angle,desired_heading,epsilon)
 
-					print("LCounts:{0:.3f}  RCounts:{1:.3f}\n".format(l_counts, r_counts))
+					# print("LCounts:{0:.3f}  RCounts:{1:.3f}\n".format(l_counts, r_counts))
 
 					# Print out pertinent data values
 					# print("{0:.5f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f};".format(data_time, desired_distance, angle, y_pos, x_pos))
@@ -231,14 +231,16 @@ while True:
 		distance = 0
 
 		# Calculate new Lat/Lon
-		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
+		dLat = ((y_pos / 1000) / earthRad)
+		dLon = ((x_pos / 1000) / (earthRad * math.cos(math.pi * lat / 180)))
 		# OffsetPosition, decimal degrees
-		newLat = lat + (dLat * (180 / math.pi))
-		newLon = lon + (dLon * (180 / math.pi))
+		newLat = lat + dLat
+		newLon = lon + dLon
+		#newLat = lat + (dLat * (180 / math.pi))
+		#newLon = lon + (dLon * (180 / math.pi))
 
 		print("Angle set.\n")
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.9f}, Lon: {1:.9f}\n".format(newLat, newLon))
 		print("The Roomba will now move the desired distance.\n")
 		desired_distance=float(input("Desired distance? "))        
 
@@ -304,13 +306,15 @@ while True:
 		Roomba.Move(0,0)
 		print("\nRestarting movement process loop.\n")
 		# Calculate new Lat/Lon
-		dLat = y_pos / earthRad
-		dLon = x_pos / (earthRad * math.cos(math.pi * lat / 180))
+		dLat = ((y_pos / 1000) / earthRad)
+		dLon = ((x_pos / 1000) / (earthRad * math.cos(math.pi * lat / 180)))
 		# OffsetPosition, decimal degrees
-		newLat = lat + dLat * (180 / math.pi)
-		newLon = lon + dLon * (180 / math.pi)
+		newLat = lat + dLat
+		newLon = lon + dLon
+		#newLat = lat + (dLat * (180 / math.pi))
+		#newLon = lon + (dLon * (180 / math.pi))
 
-		print("Current Geodetic Position Lat: {0:.6f}, Lon: {1:.6f}\n".format(newLat, newLon))
+		print("Current Geodetic Position Lat: {0:.9f}, Lon: {1:.9f}\n".format(newLat, newLon))
 
 	except KeyboardInterrupt:
 		break	# Break out of the loop early if necessary
