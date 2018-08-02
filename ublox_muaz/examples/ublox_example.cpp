@@ -12,21 +12,26 @@ using namespace std;
 ofstream data_file_;  //!< file stream for logging gps data
 std::string data_filename_; //!< file name for logging gps data
 ofstream doppler_file_; //file stream for logging doppler and calculated doppler
+ofstream speed_file_;
 std::string doppler_filename; //file name for logging doppler and calculated doppler
+std::string speed_filename;
 Position myPos = Position("hello");
 bool StartDataLogging(std::string filename) {
     try {
 
         data_filename_ = filename;
         doppler_filename = filename + "_doppler";
+        speed_filename = filename + "_speed";
         
         // open file and add header
-        data_file_.open(data_filename_.c_str());
+        data_file_.open( data_filename_.c_str());
         doppler_file_.open(doppler_filename.c_str());
+        speed_file_.open(speed_filename.c_str());
         // write header
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
         doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
+        speed_file_ << "Speed (m/s) | Time (sec)" << std::endl;
     } catch (std::exception &e) {
         std::cout << "Error opening log file: " << e.what();
         if (data_file_.is_open())
@@ -89,7 +94,8 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
                 double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
-               
+
+
                // Write to file
                 doppler_file_ << setw(3) << svid << " ";
                 doppler_file_ << setw(5) << (int)raw_meas.rawmeasreap[ii].cno << " ";
@@ -238,6 +244,11 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
                     << "\t" << (unsigned int)nav_data.pDop
                     << "\t" << (unsigned int)nav_data.numSV;
         data_file_ << std::endl;
+        if (nav_data.gpsFix == 3 )
+        {
+           speed_file_ << setw(12) << sqrt(nav_data.ecefVX * nav_data.ecefVX + nav_data.ecefVY * nav_data.ecefVY + nav_data.ecefVZ * nav_data.ecefVZ)/100. << " ";
+           speed_file_ << setw(11) << nav_data.iTOW / 1000 << endl;
+        }
 
     } catch (std::exception &e) {
         std::cout << "Navigation Solution Error";
