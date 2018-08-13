@@ -8,7 +8,6 @@
 using namespace ublox;
 using namespace std;
 
-
 ofstream data_file_;  //!< file stream for logging gps data
 std::string data_filename_; //!< file name for logging gps data
 ofstream doppler_file_; //file stream for logging doppler and calculated doppler
@@ -31,7 +30,7 @@ bool StartDataLogging(std::string filename) {
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
         doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
-        speed_file_ << "Speed (m/s) | Time (sec)" << std::endl;
+        speed_file_ << "Speed (m/s) | Heading (deg) | Time (sec)" << std::endl;
     } catch (std::exception &e) {
         std::cout << "Error opening log file: " << e.what();
         if (data_file_.is_open())
@@ -92,7 +91,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
             {
                 int svid = (unsigned int)raw_meas.rawmeasreap[ii].svid;
 
-                double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow);
+                double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
 
 
@@ -225,6 +224,8 @@ void ParsedEphems(ublox::ParsedEphemData parsed_ephem_data, double time_stamp) {
 }
 
 void NavData(ublox::NavSol nav_data, double time_stamp) {
+   static double oldlat;
+   static double oldlon;
     try{
         myPos.setCoords(nav_data.ecefX/100,nav_data.ecefY/100,nav_data.ecefZ/100);
         cout<<"position defined"<<endl;
@@ -244,9 +245,41 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
                     << "\t" << (unsigned int)nav_data.pDop
                     << "\t" << (unsigned int)nav_data.numSV;
         data_file_ << std::endl;
+        //xx = nav_data.ecefVX/100.;
+        //yy = nav_data.ecefVY/100.;
+        //zz = nav_data.ecefVZ/100.;
         if (nav_data.gpsFix == 3 )
         {
            speed_file_ << setw(12) << sqrt(nav_data.ecefVX * nav_data.ecefVX + nav_data.ecefVY * nav_data.ecefVY + nav_data.ecefVZ * nav_data.ecefVZ)/100. << " ";
+           
+           myPos.coords.ecefVX = nav_data.ecefVX;
+           myPos.coords.ecefVY = nav_data.ecefVY;
+           myPos.coords.ecefVZ = nav_data.ecefVZ;
+           
+
+           // Calculate ecef to lla
+           double a = 6378137;
+           double e = 8.1819190842622e-2;
+           double x = nav_data.ecefX/100.;
+           double y = nav_data.ecefY/100.;
+           double z = nav_data.ecefZ/100.;
+           double asq = a*a;
+           double esq = e*e;
+           double b = sqrt(asq*(1-esq));
+           double bsq = b*b;
+           double ep = sqrt((asq-bsq)/bsq);
+           double p = sqrt(x*x+y*y);
+           double th = atan2(a*z, b*p);
+           double lon = atan2(y,x) * 57.2958;
+           double lat = atan2(z+ep*ep*b*pow(sin(th), 3), (p - esq*a*pow(cos(th), 3))) * 57.2958;
+           double direction = -(atan2(lat - oldlat, lon - oldlon) * 57.2958) + 90;
+           //cout << endl << lat << " " << lon << endl; 
+           //cout.precision(17);
+           //cout << "Direction:" << direction << endl;
+           oldlon = lon;
+           oldlat = lat;
+           speed_file_ << setw(14) << direction << " ";
+
            speed_file_ << setw(11) << nav_data.iTOW / 1000 << endl;
         }
 

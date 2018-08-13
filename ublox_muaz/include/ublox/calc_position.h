@@ -29,7 +29,7 @@ public:
 	bool ephemerisExists(uint32_t id);
 	ParsedEphemData getEphemeris(uint32_t id);
 	ecef calcPosition(int id,double _time);
-	double calcDoppler(int id, double _time);
+	double calcDoppler(int id, double _time, Position myPos);
 	double calcDistance(ecef satPos);
 	void setCoords(double x, double y, double z);
 	double dopplers[50];

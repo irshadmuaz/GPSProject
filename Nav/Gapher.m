@@ -57,10 +57,10 @@ for i = 1:ASize
         
         
     
-        title(strcat(satName, ': Measured and Predicted Doppler Effects'));
+        title(strcat(satName, ': Static and Dynamic (30 m/s North) Doppler Effects'));
         xlabel('Time from start (sec)');
         ylabel('Doppler (Hz)');
-        legend({'Measured Doppler', 'Predicted Doppler'});
+        legend({'Static Doppler', 'Dynamic Doppler'});
         grid on;
         %xlim([0,maxTime]);
         
@@ -68,15 +68,15 @@ for i = 1:ASize
         subplot(3, 1, 2);
         
         hold on;   
-        plot(corrTime(startIndex:i-2), dMeas, '.', ...
+        plot(corrTime(startIndex:i-1), A(3, startIndex:i-1) - A(4, startIndex:i-1), '.', ...
         'MarkerSize', 10, 'color', 'b');
-        plot(corrTime(startIndex:i-2), dCalc, '.', ...
-        'MarkerSize', 10, 'color', 'r');
+        %plot(corrTime(startIndex:i-2), dCalc, '.', ...
+        %'MarkerSize', 10, 'color', 'r');
     
-        title(strcat(satName, ': Measured and Predicted Doppler Differential'));
+        title(strcat(satName, ': Doppler Error'));
         xlabel('Time from start (sec)');
-        ylabel('Doppler Differential (Hz/sec)');
-        legend({'Measured Differential', 'Predicted Differential'});
+        ylabel('Doppler Error (Hz)');
+        %legend({'Measured Differential', 'Predicted Differential'});
         grid on;
         %xlim([0,maxTime]);
         

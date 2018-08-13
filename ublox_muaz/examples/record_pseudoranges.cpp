@@ -81,7 +81,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
             {
                 int svid = (unsigned int)raw_meas.rawmeasreap[ii].svid;
 
-                double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow);
+                double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow,  myPos);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
                
                // Write to file
