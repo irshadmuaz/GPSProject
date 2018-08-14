@@ -20,7 +20,7 @@ class Position{
 private:
 	string name;
 	map <uint32_t,ParsedEphemData> ephemeris;
-	ecef coords;
+	
 public:
 	Position(string name);
 	string getName();
@@ -29,11 +29,12 @@ public:
 	bool ephemerisExists(uint32_t id);
 	ParsedEphemData getEphemeris(uint32_t id);
 	ecef calcPosition(int id,double _time);
-	double calcDoppler(int id, double _time);
+	double calcDoppler(int id, double _time, Position myPos);
 	double calcDistance(ecef satPos);
 	void setCoords(double x, double y, double z);
 	double dopplers[50];
 	double calcDopplers[50];
+   ecef coords;
 };
 
 // Holds the ephemris data as defined in RINEX 2.10
@@ -97,4 +98,3 @@ struct CalcData
 	double   relPos[3];  // Relative position compared to reciever
 	double   doppler;    // Doppler in Hz
 };
-

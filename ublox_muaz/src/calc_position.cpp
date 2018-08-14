@@ -145,7 +145,7 @@ double Position::calcDistance(ecef satPos)
 	}
 	return distance;
 }
-double Position::calcDoppler(int id, double _time)
+double Position::calcDoppler(int id, double _time, Position myPos)
 {
    ParsedEphemData ephemeris = this->ephemeris[id];
    struct CalcData calc;
@@ -243,9 +243,13 @@ double Position::calcDoppler(int id, double _time)
 
    // Calculate velocity
    temp1 = calc.yOrbDot * cos(calc.inc) - calc.yOrb * sin(calc.inc) * calc.incDot;
-   calc.vel[0] = -calc.omegaDot * calc.pos[1] + calc.xOrbDot * cos(calc.omega) - temp1 * sin(calc.omega);
-   calc.vel[1] = calc.omegaDot * calc.pos[0] + calc.xOrbDot * sin(calc.omega) + temp1 * cos(calc.omega);
-   calc.vel[2] = calc.yOrb * cos(calc.inc) * calc.incDot + calc.yOrbDot * sin(calc.inc);
+   calc.vel[0] = -calc.omegaDot * calc.pos[1] + calc.xOrbDot * cos(calc.omega) - temp1 * sin(calc.omega) - myPos.coords.ecefVX / 100.;
+   calc.vel[1] = calc.omegaDot * calc.pos[0] + calc.xOrbDot * sin(calc.omega) + temp1 * cos(calc.omega) - myPos.coords.ecefVY / 100.;
+   calc.vel[2] = calc.yOrb * cos(calc.inc) * calc.incDot + calc.yOrbDot * sin(calc.inc) - myPos.coords.ecefVZ / 100.;
+   //cout << myPos.coords.ecefVX / 100. << endl;
+   //cout << myPos.coords.ecefVY / 100. << endl;
+   //cout << myPos.coords.ecefVZ / 100. << endl;
+
 
    // Doppler
    for (int k = 0; k < 3; k++)
@@ -254,7 +258,7 @@ double Position::calcDoppler(int id, double _time)
    calc.relVel = (calc.relPos[0] * calc.vel[0] + calc.relPos[1] * calc.vel[1] + calc.relPos[2] * calc.vel[2]) /
       sqrt(calc.relPos[0] * calc.relPos[0] + calc.relPos[1] * calc.relPos[1] + calc.relPos[2] * calc.relPos[2]);
 
-   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; // - 400
+   calc.doppler = 1.57542e9 * calc.relVel / 299792458.0; //
 
    return calc.doppler;
 
