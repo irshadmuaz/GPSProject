@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include "ublox/calc_position.h"
+#include <thread>
 // #include "boost/filesystem.hpp"
 
 using namespace ublox;
@@ -228,7 +229,7 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
    static double oldlon;
     try{
         myPos.setCoords(nav_data.ecefX/100,nav_data.ecefY/100,nav_data.ecefZ/100);
-        cout<<"position defined"<<endl;
+        //cout<<"position defined"<<endl;
         data_file_  << fixed << "Position" << "\t" << (signed long) nav_data.iTOW;
         data_file_  << setprecision(12) << "\t" << nav_data.ecefX/100.
                     << "\t" << nav_data.ecefY/100.
@@ -295,17 +296,45 @@ void StopLoggingData() {
     if (doppler_file_.is_open())
         doppler_file_.close();
 }
+int extra_receiver(std::string& port)
+{
+  //cout<<"Port2: "<<port<<endl;
+  Ublox second_gps;
+  if(second_gps.Connect(port,115200))
+  {
+    cout<<"Receiver 2 Successfully connected"<<endl;
+  }
+  else
+  {
+      cout<<"Failed to connect second receiver"<<endl;
+      return -1;
 
+  }
+  second_gps.ConfigureNavigationParameters(4,2);
+  second_gps.SbasOff();
+  second_gps.set_nav_solution_callback(NavData);
+  second_gps.ConfigureMessageRate(0x01,0x06,2);
+  while(1);
+  return 0;
+}
 int main(int argc, char **argv)
 {
     Ublox my_gps;
+    std:: string port2;
+    if (argc > 3)
+    {
+      port2 = argv[3];
+      std::thread t1(extra_receiver, std::ref(port2));
+      t1.detach();
+      usleep(50*100000);
 
-   
-    if(argc < 3) {
+    }
+    else if(argc < 3) {
         std::cerr << "Usage: ublox_example <serial port address> <baud rate>" << std::endl;
         return 0;
     }
     
+
     std::string port(argv[1]);
     int baudrate=115200;
     istringstream(argv[2]) >> baudrate;
@@ -329,7 +358,7 @@ int main(int argc, char **argv)
     my_gps.set_rxm_raw_callback(PseudorangeData);
     //my_gps.set_nav_clock_callback(ClockData);
     my_gps.set_parsed_ephem_callback(ParsedEphems);
-    my_gps.set_nav_solution_callback(NavData);
+      //my_gps.set_nav_solution_callback(NavData);
 
     //! Configure ublox
     // request pseudorange data
@@ -339,8 +368,12 @@ int main(int argc, char **argv)
     // nav clock data
     my_gps.ConfigureMessageRate(0x0B,0x31,1);
     // nav solution data
-    my_gps.ConfigureMessageRate(0x01,0x06,1);
-    
+      //my_gps.ConfigureMessageRate(0x01,0x06,1);
+    if(argc == 3)
+    {
+      my_gps.set_nav_solution_callback(NavData);
+      my_gps.ConfigureMessageRate(0x01,0x06,1);
+    }
     // loop forever
     while(1)
       usleep(50*1000); // sleep for 50 ms
