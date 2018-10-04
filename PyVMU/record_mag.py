@@ -11,6 +11,7 @@ mag = [0, 0, 0]
 euler = [0, 0, 0]
 ts_mag = 0
 ts_euler = 0
+i = 0
 
 with VMU931Parser(euler=True, magnetometer=True) as vp:
 
@@ -26,10 +27,13 @@ with VMU931Parser(euler=True, magnetometer=True) as vp:
             ts_mag, mag[0], mag[1], mag[2] = pkt 
 
         if isinstance(pkt, messages.Euler):
+            i = i + 1
             ts_euler, euler[0], euler[1], euler[2] = pkt 
             print("Euler X: %d\nEuler Y: %d\nEuler Z: %d"%(euler[0], euler[1], euler[2]))
             print("Mag X: %d\nMag Y: %d\nMag Z: %d"%(mag[0], mag[1], mag[2]))
-            f.write("%6.1f  %6.1f  %6.1f %8.1f  %8.1f  %8.1f     %d\n"%(mag[0], mag[1], mag[2], euler[0], euler[1], euler[2], ts_euler))
+            if i == 200:
+                i = 0
+                f.write("%6.1f  %6.1f  %6.1f %8.1f  %8.1f  %8.1f     %d\n"%(mag[0], mag[1], mag[2], euler[0], euler[1], euler[2], ts_euler))
 
 
 

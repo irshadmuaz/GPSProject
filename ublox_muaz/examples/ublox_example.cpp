@@ -30,7 +30,7 @@ bool StartDataLogging(std::string filename) {
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
         doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
-        speed_file_ << "X Direction (m/s) | Y Direction (m/s) | Z Direction (m/s) | Time (sec) (XYZ in ecef coords)" << std::endl;
+        speed_file_ << "X Direction (m/s) | Y Direction (m/s) | Z Direction (m/s) | Heading (deg) | Time (sec) (XYZ in ecef coords)" << std::endl;
     } catch (std::exception &e) {
         std::cout << "Error opening log file: " << e.what();
         if (data_file_.is_open())
@@ -278,7 +278,8 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
            //cout << "Direction:" << direction << endl;
            oldlon = lon;
            oldlat = lat;
-           speed_file_ << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. << " " << setw(17) << nav_data.ecefVZ/100. << " ";
+           speed_file_ << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. << 
+           " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
 
            speed_file_ << setw(11) << nav_data.iTOW / 1000 << endl;
         }
