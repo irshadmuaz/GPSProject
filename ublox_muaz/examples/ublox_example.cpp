@@ -59,7 +59,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
          double averageCalc;
 	 vector<double> vecDop;
          int clearSats;
-         double prevMedian = 0;
+         static double prevMedian = 0;
 
         
         data_file_ << fixed << "RANGE" << "\t" << (signed long)raw_meas.iTow;
@@ -77,7 +77,14 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
         data_file_ << std::endl;
         data_file_ << fixed << "DOPPLER" << "\t" << (double)raw_meas.iTow;
 
-        vecDop.clear();
+	// Calculate median prior
+	vecDop.clear();
+	for(int ii=0;ii<raw_meas.numSV; ii++) 
+		if (myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid) && !raw_meas.rawmeasreap[ii].gnssId)
+                	vecDop.push_back(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler);
+	sort(vecDop.begin(), vecDop.end());
+	prevMedian = vecDop.at((int)(vecDop.size() / 2));
+        
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
             << "\t" << setprecision(3) << raw_meas.rawmeasreap[ii].doppler; // m
@@ -95,8 +102,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
                 double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
-                vecDop.push_back(calcDoppler - measDoppler);
-                measDoppler -= prevMedian;
+		measDoppler += prevMedian;
 
                // Write to file
                 doppler_file_ << setw(3) << svid << " ";
@@ -132,13 +138,13 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
                // Write to cout
                 cout << "  Calc: " << setw(8) << calcDoppler << "  Meas: "<< setw(8) << measDoppler
-                << "  Error: " << setw(8) << calcDoppler - measDoppler
-                << "  CalcDiff: " << setw(12) << calcDiff
-                << "  MeasDiff: " << setw(12) << measDiff
-                << "  DiffError: " << setw(12) << calcDiff - measDiff
-                << "  DataPoints: " << setw(5) << totNum[svid - 1];
-                if (calcDiff - measDiff <= 0.015 && calcDiff - measDiff >= -0.015) 
-                   cout << "  Clear!";
+                << "  Error: " << setw(10) << std::setprecision( 6 ) << std::setfill( ' ' ) << calcDoppler - measDoppler;
+                //<< "  CalcDiff: " << setw(12) << calcDiff
+                //<< "  MeasDiff: " << setw(12) << measDiff
+                //<< "  DiffError: " << setw(12) << calcDiff - measDiff
+                //<< "  DataPoints: " << setw(5) << totNum[svid - 1];
+                //if (calcDiff - measDiff <= 0.015 && calcDiff - measDiff >= -0.015) 
+                //   cout << "  Clear!";
                 
                 cout << endl;
                 myPos.dopplers[svid] = measDoppler;
@@ -148,7 +154,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 	clearSats = 0;
 	sort(vecDop.begin(), vecDop.end());
 	cout << "MEDIAN ERROR: " << vecDop.at((int)(vecDop.size() / 2)) << endl;
-    prevMedian = vecDop.at((int)(vecDop.size() / 2));
+    //prevMedian = vecDop.at((int)(vecDop.size() / 2));
 	for (int r = 0; r < vecDop.size(); r++)
 		if (vecDop.at(r) >= vecDop.at((int)(vecDop.size() / 2)) - 25 &&
 		    vecDop.at(r) <= vecDop.at((int)(vecDop.size() / 2)) + 25 )
