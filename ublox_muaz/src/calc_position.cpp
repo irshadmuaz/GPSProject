@@ -57,17 +57,17 @@ ecef Position::calcPosition(int id,double _time)
 	long double e=				ephemeris.ecc;		//                        =  0.00223578442819;
 	long double delta_n=		ephemeris.dN;	//                  =  0.465376527657e-08;
 	long double smallomega=		ephemeris.omega;//               =  2.06374037770;
-	long double cus = 			ephemeris.cus;	//                      =  0.177137553692e-05; 
-	long double cuc=			ephemeris.cuc;	//                     =  0.457651913166e-05; 
-	long double crs=			ephemeris.crs;	//                      =  88.6875000000; 
-	long double crc=			ephemeris.crc;	//                      =  344.968750000; 
+	long double cus = 			ephemeris.cus;	//                      =  0.177137553692e-05;
+	long double cuc=			ephemeris.cuc;	//                     =  0.457651913166e-05;
+	long double crs=			ephemeris.crs;	//                      =  88.6875000000;
+	long double crc=			ephemeris.crc;	//                      =  344.968750000;
 	long double cis=			ephemeris.cis;	//                      = -0.856816768646e-07;
-	long double cic=			ephemeris.cic;	//                     =  0.651925802231e-07; 
-	long double idot=			ephemeris.dia;	//                     =  0.342514267094e-09; 
-	long double i0=				ephemeris.ia;		//                       =  0.961685061380; 
-	long double bigomega0=		ephemeris.wo;//                =  1.64046615454; 
+	long double cic=			ephemeris.cic;	//                     =  0.651925802231e-07;
+	long double idot=			ephemeris.dia;	//                     =  0.342514267094e-09;
+	long double i0=				ephemeris.ia;		//                       =  0.961685061380;
+	long double bigomega0=		ephemeris.wo;//                =  1.64046615454;
 	long double earthrate =  	bOMEGAE84;
-	long double bigomegadot=	ephemeris.dwo;	//              = -0.856928551657e-08; 
+	long double bigomegadot=	ephemeris.dwo;	//              = -0.856928551657e-08;
 	long double t = _time;	// 			86400.00;
 	long double A;
 	long double n0, n;
@@ -140,7 +140,7 @@ double Position::calcDistance(ecef satPos)
 	double distance = 0;
 	if(this->coords.defined)
 	{
-		
+
 		distance = sqrt(pow((satPos.ecefX - this->coords.ecefX),2)+pow((satPos.ecefY - this->coords.ecefY),2)+pow((satPos.ecefZ - this->coords.ecefZ),2));
 	}
 	return distance;
@@ -178,7 +178,7 @@ double Position::calcDoppler(int id, double _time, Position myPos)
    eph.w = ephemeris.omega;
    eph.omegaDot = ephemeris.dwo;
    eph.IDOT = ephemeris.dia;
-   
+
    // Semimajor axis
    calc.a = eph.sqrta * eph.sqrta;
 
@@ -263,7 +263,7 @@ double Position::calcDoppler(int id, double _time, Position myPos)
    return calc.doppler;
 
 	/* OLD ecef t1 = this->calcPosition(id,_time); //satelite position
-   
+
 	t1.ecefX = this->coords.ecefX - t1.ecefX;
 	t1.ecefY = this->coords.ecefY - t1.ecefY;
 	t1.ecefZ = this->coords.ecefZ - t1.ecefZ;//user position - satelite position

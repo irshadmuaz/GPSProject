@@ -13,8 +13,10 @@ ofstream data_file_;  //!< file stream for logging gps data
 std::string data_filename_; //!< file name for logging gps data
 ofstream doppler_file_; //file stream for logging doppler and calculated doppler
 ofstream speed_file_;
+ofstream speed_spoofed_file;
 std::string doppler_filename; //file name for logging doppler and calculated doppler
 std::string speed_filename;
+std::string spoofed_speed_filename;
 Position myPos = Position("hello");
 bool StartDataLogging(std::string filename) {
     try {
@@ -22,11 +24,12 @@ bool StartDataLogging(std::string filename) {
         data_filename_ = filename;
         doppler_filename = filename + "_doppler";
         speed_filename = filename + "_speed";
-        
+        spoofed_speed_filename = filename+"_spoofed_speed";
         // open file and add header
         data_file_.open( data_filename_.c_str());
         doppler_file_.open(doppler_filename.c_str());
         speed_file_.open(speed_filename.c_str());
+        speed_spoofed_file.open(spoofed_speed_filename.c_str());
         // write header
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
@@ -61,7 +64,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
          int clearSats;
          static double prevMedian = 0;
 
-        
+
         data_file_ << fixed << "RANGE" << "\t" << (signed long)raw_meas.iTow;
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
@@ -79,12 +82,12 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
 	// Calculate median prior
 	vecDop.clear();
-	for(int ii=0;ii<raw_meas.numSV; ii++) 
+	for(int ii=0;ii<raw_meas.numSV; ii++)
 		if (myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid) && !raw_meas.rawmeasreap[ii].gnssId)
                 	vecDop.push_back(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler);
 	sort(vecDop.begin(), vecDop.end());
 	prevMedian = vecDop.at((int)(vecDop.size() / 2));
-        
+
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
             << "\t" << setprecision(3) << raw_meas.rawmeasreap[ii].doppler; // m
@@ -143,9 +146,9 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                 //<< "  MeasDiff: " << setw(12) << measDiff
                 //<< "  DiffError: " << setw(12) << calcDiff - measDiff
                 //<< "  DataPoints: " << setw(5) << totNum[svid - 1];
-                //if (calcDiff - measDiff <= 0.015 && calcDiff - measDiff >= -0.015) 
+                //if (calcDiff - measDiff <= 0.015 && calcDiff - measDiff >= -0.015)
                 //   cout << "  Clear!";
-                
+
                 cout << endl;
                 myPos.dopplers[svid] = measDoppler;
                 myPos.calcDopplers[svid] = calcDoppler;
@@ -170,7 +173,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
     } catch (std::exception &e) {
         std::cout << "PseudorangeData() error";
-    }    
+    }
 }
 
 // PACK(
@@ -197,7 +200,7 @@ void ClockData(ublox::NavClock nav_clock, double time_stamp) {
 
     } catch (std::exception &e) {
         std::cout << "ClockData() error";
-    }    
+    }
 }
 
 void ParsedEphems(ublox::ParsedEphemData parsed_ephem_data, double time_stamp) {
@@ -230,7 +233,7 @@ void ParsedEphems(ublox::ParsedEphemData parsed_ephem_data, double time_stamp) {
     } catch (std::exception &e) {
         std::cout << "ParsedEphems() error";
     }
-    
+
 }
 
 void NavData(ublox::NavSol nav_data, double time_stamp) {
@@ -261,11 +264,11 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
         if (nav_data.gpsFix == 3 )
         {
            //speed_file_ << setw(12) << sqrt(nav_data.ecefVX * nav_data.ecefVX + nav_data.ecefVY * nav_data.ecefVY + nav_data.ecefVZ * nav_data.ecefVZ)/100. << " ";
-           
+
            myPos.coords.ecefVX = nav_data.ecefVX;
            myPos.coords.ecefVY = nav_data.ecefVY;
            myPos.coords.ecefVZ = nav_data.ecefVZ;
-           
+
 
            // Calculate ecef to lla
            double a = 6378137;
@@ -283,12 +286,12 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
            double lon = atan2(y,x) * 57.2958;
            double lat = atan2(z+ep*ep*b*pow(sin(th), 3), (p - esq*a*pow(cos(th), 3))) * 57.2958;
            double direction = -(atan2(lat - oldlat, lon - oldlon) * 57.2958) + 90;
-           //cout << endl << lat << " " << lon << endl; 
+           //cout << endl << lat << " " << lon << endl;
            //cout.precision(17);
            //cout << "Direction:" << direction << endl;
            oldlon = lon;
            oldlat = lat;
-           speed_file_ << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. << 
+           speed_file_ << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. <<
            " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
 
            speed_file_ << setw(11) << nav_data.iTOW / 1000 << endl;
@@ -297,9 +300,38 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
     } catch (std::exception &e) {
         std::cout << "Navigation Solution Error";
     }
-    
-}
 
+}
+void NavData_spoofed(ublox::NavSol nav_data, double time_stamp) {
+  static double oldlat;
+  static double oldlon;
+    try{
+      double a = 6378137;
+      double e = 8.1819190842622e-2;
+      double x = nav_data.ecefX/100.;
+      double y = nav_data.ecefY/100.;
+      double z = nav_data.ecefZ/100.;
+      double asq = a*a;
+      double esq = e*e;
+      double b = sqrt(asq*(1-esq));
+      double bsq = b*b;
+      double ep = sqrt((asq-bsq)/bsq);
+      double p = sqrt(x*x+y*y);
+      double th = atan2(a*z, b*p);
+      double lon = atan2(y,x) * 57.2958;
+      double lat = atan2(z+ep*ep*b*pow(sin(th), 3), (p - esq*a*pow(cos(th), 3))) * 57.2958;
+      double direction = -(atan2(lat - oldlat, lon - oldlon) * 57.2958) + 90;
+           speed_spoofed_file << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. <<
+           " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
+
+           speed_spoofed_file << setw(11) << nav_data.iTOW / 1000 << endl;
+        
+
+    } catch (std::exception &e) {
+        std::cout << "Navigation Solution Error";
+    }
+
+}
 void StopLoggingData() {
     if (data_file_.is_open())
         data_file_.close();
@@ -323,7 +355,7 @@ int extra_receiver(std::string& port)
   second_gps.ConfigureNavigationParameters(4,2);
   second_gps.SbasOff();
   second_gps.set_nav_solution_callback(NavData);
-  second_gps.ConfigureMessageRate(0x01,0x06,2);
+  second_gps.ConfigureMessageRate(0x01,0x06,1);
   while(1);
   return 0;
 }
@@ -343,7 +375,7 @@ int main(int argc, char **argv)
         std::cerr << "Usage: ublox_example <serial port address> <baud rate>" << std::endl;
         return 0;
     }
-    
+
 
     std::string port(argv[1]);
     int baudrate=115200;
@@ -360,7 +392,7 @@ int main(int argc, char **argv)
         }
     //! Start Data Logging
     bool logging_on = StartDataLogging("range_data.log");
-    
+
     my_gps.ConfigureNavigationParameters(4,2);
     my_gps.SbasOff();
 
@@ -384,6 +416,11 @@ int main(int argc, char **argv)
       my_gps.set_nav_solution_callback(NavData);
       my_gps.ConfigureMessageRate(0x01,0x06,1);
     }
+    else
+    {
+      my_gps.set_nav_solution_callback(NavData_spoofed);
+      my_gps.ConfigureMessageRate(0x01,0x06,1);
+    }
     // loop forever
     while(1)
       usleep(50*1000); // sleep for 50 ms
@@ -392,26 +429,3 @@ int main(int argc, char **argv)
     StopLoggingData();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
