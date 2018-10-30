@@ -98,17 +98,19 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
   const int numberofmodes = vecDop.size();//5;//This indicates the number of satellites to pick with maximum deviation
   float sum = 0.0;
   float mean_Sq = 0.0;
-  for(int i=vecDop.size();i>(vecDop.size()-numberofmodes);i--)//Calculate mean deviation of top numberofmodes
+  for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
   {
-    sum += vecDop[i]-prevMedian;
+    sum += (vecDop[i]);
+    cout<<"sats: "<<vecDop[i]<<endl;
   }
   float mean = sum/numberofmodes;
-  for(int i=vecDop.size();i>(vecDop.size()-numberofmodes);i--)//Calculate mean deviation of top numberofmodes
+  sum = 0;
+  for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
   {
-    sum += pow((vecDop[i]-mean-prevMedian),2);
+    sum += pow((vecDop[i]-mean),2);
   }
-  float deviation = sqrt(sum)/numberofmodes;
-  cout<<"Deviation: "<<deviation<<endl;
+  float deviation = sqrt(sum/numberofmodes);
+  cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" sum: "<<sum<<endl;
   test_file<<(double)raw_meas.iTow<<",";
   for(int i=0;i<thresholds;i++)
   {
@@ -137,7 +139,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 
                 double calcDoppler = myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos);
                 double measDoppler = raw_meas.rawmeasreap[ii].doppler;
-		measDoppler += prevMedian;
+		              measDoppler += prevMedian;
 
                // Write to file
                 doppler_file_ << setw(3) << svid << " ";
