@@ -13,10 +13,12 @@ ofstream data_file_;  //!< file stream for logging gps data
 std::string data_filename_; //!< file name for logging gps data
 ofstream doppler_file_; //file stream for logging doppler and calculated doppler
 ofstream speed_file_;
+ofstream test_file;
 ofstream speed_spoofed_file;
 std::string doppler_filename; //file name for logging doppler and calculated doppler
 std::string speed_filename;
 std::string spoofed_speed_filename;
+const int thresholds = 50;
 Position myPos = Position("hello");
 bool StartDataLogging(std::string filename) {
     try {
@@ -30,11 +32,16 @@ bool StartDataLogging(std::string filename) {
         doppler_file_.open(doppler_filename.c_str());
         speed_file_.open(speed_filename.c_str());
         speed_spoofed_file.open(spoofed_speed_filename.c_str());
+        test_file.open("test_file.csv");
         // write header
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
         doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
         speed_file_ << "X Direction (m/s) | Y Direction (m/s) | Z Direction (m/s) | Heading (deg) | Time (sec) (XYZ in ecef coords)" << std::endl;
+        test_file<<"Thresholds,";
+        for(int i=0;i<thresholds;i++)
+            test_file<<i<<",";
+        test_file<<std::endl;
     } catch (std::exception &e) {
         std::cout << "Error opening log file: " << e.what();
         if (data_file_.is_open())
@@ -54,13 +61,13 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
          static double measBuffer[32][BUF_SIZE];
          static double calcBuffer[32][BUF_SIZE];
          static double prevMeas[32];
-	 static double prevCalc[32];
+	       static double prevCalc[32];
          double measDiff, calcDiff;
          static int dopNum[32];
          static int totNum[32];
          double averageDop;
          double averageCalc;
-	 vector<double> vecDop;
+	       vector<double> vecDop;
          int clearSats;
          static double prevMedian = 0;
 
@@ -87,6 +94,31 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                 	vecDop.push_back(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler);
 	sort(vecDop.begin(), vecDop.end());
 	prevMedian = vecDop.at((int)(vecDop.size() / 2));
+  /*=============================================================*/
+  const int numberofmodes = vecDop.size();//5;//This indicates the number of satellites to pick with maximum deviation
+  float sum = 0.0;
+  float mean_Sq = 0.0;
+  for(int i=vecDop.size();i>(vecDop.size()-numberofmodes);i--)//Calculate mean deviation of top numberofmodes
+  {
+    sum += vecDop[i]-prevMedian;
+  }
+  float mean = sum/numberofmodes;
+  for(int i=vecDop.size();i>(vecDop.size()-numberofmodes);i--)//Calculate mean deviation of top numberofmodes
+  {
+    sum += pow((vecDop[i]-mean-prevMedian),2);
+  }
+  float deviation = sqrt(sum)/numberofmodes;
+  cout<<"Deviation: "<<deviation<<endl;
+  test_file<<(double)raw_meas.iTow<<",";
+  for(int i=0;i<thresholds;i++)
+  {
+    if(deviation > i)
+      test_file<<1<<":"<<myPos.speed_diff<<",";
+    else
+      test_file<<0<<":"<<myPos.speed_diff<<",";
+  }
+  test_file<<std::endl;
+  /*=============================================================*/
 
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
@@ -325,7 +357,8 @@ void NavData_spoofed(ublox::NavSol nav_data, double time_stamp) {
            " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
 
            speed_spoofed_file << setw(11) << nav_data.iTOW / 1000 << endl;
-        
+           myPos.speed_diff = sqrt(pow((nav_data.ecefVX/100),2)+pow((nav_data.ecefVY/100),2)+pow((nav_data.ecefVZ/100),2));
+           myPos.speed_diff -= sqrt(pow((myPos.coords.ecefVX/100),2)+pow((myPos.coords.ecefVY/100),2)+pow((myPos.coords.ecefVZ/100),2));
 
     } catch (std::exception &e) {
         std::cout << "Navigation Solution Error";

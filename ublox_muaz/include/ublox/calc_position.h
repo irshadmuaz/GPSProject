@@ -20,7 +20,7 @@ class Position{
 private:
 	string name;
 	map <uint32_t,ParsedEphemData> ephemeris;
-	
+
 public:
 	Position(string name);
 	string getName();
@@ -35,6 +35,7 @@ public:
 	double dopplers[50];
 	double calcDopplers[50];
    ecef coords;
+	 double speed_diff;
 };
 
 // Holds the ephemris data as defined in RINEX 2.10
@@ -68,7 +69,7 @@ struct EphData
 };
 
 // Holds data that is calculated from the satellite ephemris and reciever data
-struct CalcData 
+struct CalcData
 {
    double   pos[3];     // GPS satellite position in ECEF
    double   vel[3];     // GPS satellite velocity in ECEF
