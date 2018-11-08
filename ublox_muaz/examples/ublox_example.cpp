@@ -91,7 +91,7 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 	vecDop.clear();
 	for(int ii=0;ii<raw_meas.numSV; ii++)
 		if (myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid) && !raw_meas.rawmeasreap[ii].gnssId)
-                	vecDop.push_back(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler);
+                	vecDop.push_back(abs(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler));
 	sort(vecDop.begin(), vecDop.end());
 	prevMedian = vecDop.at((int)(vecDop.size() / 2));
   /*=============================================================*/
@@ -104,20 +104,40 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
     cout<<"sats: "<<vecDop[i]<<endl;
   }
   float mean = sum/numberofmodes;
+  float m = (sum - (prevMedian*numberofmodes))/numberofmodes;
   sum = 0;
   for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
   {
     sum += pow((vecDop[i]-mean),2);
   }
   float deviation = sqrt(sum/numberofmodes);
-  cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" sum: "<<sum<<endl;
+
   test_file<<(double)raw_meas.iTow<<",";
+
+  float top_mean = 0.0;
+  int top = 3;
+  sum = 0.0;
+  for(int i=vecDop.size()-top; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+  {
+    sum += abs(vecDop[i] - prevMedian);
+  }
+  top_mean = sum/top;
+  cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" m "<<m<<" top_mean: "<<top_mean<<endl;
   for(int i=0;i<thresholds;i++)
   {
     if(deviation > i)
-      test_file<<1<<":"<<myPos.speed_diff<<",";
+      test_file<<1;
     else
-      test_file<<0<<":"<<myPos.speed_diff<<",";
+      test_file<<0;
+    if(m > i)
+      test_file<<":"<<1;
+    else
+      test_file<<":"<<0;
+    if(top_mean > i)
+      test_file<<":"<<1;
+    else
+      test_file<<":"<<0;
+    test_file<<":"<<myPos.speed_diff<<",";
   }
   test_file<<std::endl;
   /*=============================================================*/
@@ -411,7 +431,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-
+    
     std::string port(argv[1]);
     int baudrate=115200;
     istringstream(argv[2]) >> baudrate;
