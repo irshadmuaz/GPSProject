@@ -35,7 +35,9 @@ public:
 	double dopplers[50];
 	double calcDopplers[50];
    ecef coords;
+   ecef spoofed_speed;
 	 double speed_diff;
+    bool isfix = false;
 };
 
 // Holds the ephemris data as defined in RINEX 2.10

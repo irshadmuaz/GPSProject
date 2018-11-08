@@ -241,6 +241,15 @@ double Position::calcDoppler(int id, double _time, Position myPos)
    calc.pos[1] = calc.xOrb * sin(calc.omega) + calc.yOrb * cos(calc.inc) * cos(calc.omega);
    calc.pos[2] = calc.yOrb * sin(calc.inc);
 
+   if(myPos.spoofed_speed.defined)//I am being spoofed
+   {
+   		float spoofed_mag = sqrt(pow((myPos.spoofed_speed.ecefVX/100),2)+pow((myPos.spoofed_speed.ecefVY/100),2)+pow((myPos.spoofed_speed.ecefVZ/100),2));
+   		float act_mag = sqrt(pow((myPos.coords.ecefVX/100),2)+pow((myPos.coords.ecefVY/100),2)+pow((myPos.coords.ecefVZ/100),2));
+   		myPos.coords.ecefVX = myPos.coords.ecefVX*spoofed_mag/act_mag;
+   		myPos.coords.ecefVY = myPos.coords.ecefVY*spoofed_mag/act_mag;
+   		myPos.coords.ecefVZ = myPos.coords.ecefVZ*spoofed_mag/act_mag;
+   }
+
    // Calculate velocity
    temp1 = calc.yOrbDot * cos(calc.inc) - calc.yOrb * sin(calc.inc) * calc.incDot;
    calc.vel[0] = -calc.omegaDot * calc.pos[1] + calc.xOrbDot * cos(calc.omega) - temp1 * sin(calc.omega) - myPos.coords.ecefVX / 100.;

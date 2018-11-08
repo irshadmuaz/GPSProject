@@ -36,7 +36,8 @@ bool StartDataLogging(std::string filename) {
         // write header
         data_file_ << "%%RANGE  1) GPS Time(ms) 2) SVID  3) Pseudorange (m)  4) SVID  5) Pseudorange ..." << std::endl;
         data_file_ << "%%CLOCK  1) GPS Time(ms) 2) ClockBias(nsec) 3) ClkDrift(nsec/sec) 4) TimeAccuracyEstimate(nsec) 5) FreqAccuracyEstimate(ps/s)" << std::endl;
-        doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | REC SPEED | SPEED DIFF | Y M D H M S" << std::endl;        speed_file_ << "X Direction (m/s) | Y Direction (m/s) | Z Direction (m/s) | Heading (deg) | Time (sec) (XYZ in ecef coords)" << std::endl;
+        doppler_file_ << "PRN | SNR | MEASURED | CALCULATED | DIFFERENCE | Y M D H M S" << std::endl;
+        speed_file_ << "X Direction (m/s) | Y Direction (m/s) | Z Direction (m/s) | Heading (deg) | Time (sec) (XYZ in ecef coords)" << std::endl;
         test_file<<"Thresholds,";
         for(int i=0;i<thresholds;i++)
             test_file<<i<<",";
@@ -93,53 +94,56 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                 	vecDop.push_back(abs(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler));
 	sort(vecDop.begin(), vecDop.end());
 	prevMedian = vecDop.at((int)(vecDop.size() / 2));
-  /*=============================================================*/
-  const int numberofmodes = vecDop.size();//5;//This indicates the number of satellites to pick with maximum deviation
-  float sum = 0.0;
-  float mean_Sq = 0.0;
-  for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+  if(myPos.isfix)
   {
-    sum += (vecDop[i]);
-    cout<<"sats: "<<vecDop[i]<<endl;
-  }
-  float mean = sum/numberofmodes;
-  float m = (sum - (prevMedian*numberofmodes))/numberofmodes;
-  sum = 0;
-  for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
-  {
-    sum += pow((vecDop[i]-mean),2);
-  }
-  float deviation = sqrt(sum/numberofmodes);
+    /*=============================================================*/
+    const int numberofmodes = vecDop.size();//5;//This indicates the number of satellites to pick with maximum deviation
+    float sum = 0.0;
+    float mean_Sq = 0.0;
+    for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+    {
+      sum += (vecDop[i]);
+      cout<<"sats: "<<vecDop[i]<<endl;
+    }
+    float mean = sum/numberofmodes;
+    float m = (sum - (prevMedian*numberofmodes))/numberofmodes;
+    sum = 0;
+    for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+    {
+      sum += pow((vecDop[i]-mean),2);
+    }
+    float deviation = sqrt(sum/numberofmodes);
 
-  test_file<<(double)raw_meas.iTow<<",";
+    test_file<<(double)raw_meas.iTow<<",";
 
-  float top_mean = 0.0;
-  int top = 3;
-  sum = 0.0;
-  for(int i=vecDop.size()-top; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
-  {
-    sum += abs(vecDop[i] - prevMedian);
+    float top_mean = 0.0;
+    int top = 3;
+    sum = 0.0;
+    for(int i=vecDop.size()-top; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+    {
+      sum += abs(vecDop[i] - prevMedian);
+    }
+    top_mean = sum/top;
+    cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" m "<<m<<" top_mean: "<<top_mean<<endl;
+    for(int i=0;i<thresholds;i++)
+    {
+      if(deviation > i)
+        test_file<<1;
+      else
+        test_file<<0;
+      if(m > i)
+        test_file<<":"<<1;
+      else
+        test_file<<":"<<0;
+      if(top_mean > i)
+        test_file<<":"<<1;
+      else
+        test_file<<":"<<0;
+      test_file<<":"<<myPos.speed_diff<<",";
+    }
+    test_file<<std::endl;
+    /*=============================================================*/
   }
-  top_mean = sum/top;
-  cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" m "<<m<<" top_mean: "<<top_mean<<endl;
-  for(int i=0;i<thresholds;i++)
-  {
-    if(deviation > i)
-      test_file<<1;
-    else
-      test_file<<0;
-    if(m > i)
-      test_file<<":"<<1;
-    else
-      test_file<<":"<<0;
-    if(top_mean > i)
-      test_file<<":"<<1;
-    else
-      test_file<<":"<<0;
-    test_file<<":"<<myPos.speed_diff<<",";
-  }
-  test_file<<std::endl;
-  /*=============================================================*/
 
         for(int ii=0;ii<raw_meas.numSV; ii++) {
             data_file_  << "\t" << (unsigned int)raw_meas.rawmeasreap[ii].svid
@@ -151,6 +155,10 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
             else if (raw_meas.rawmeasreap[ii].gnssId)
             {
                cout << "  Non-GPS Constellation" << endl;
+            }
+            else if (myPos.isfix == false)
+            {
+              cout<<" No fix at this time";
             }
             else
             {
@@ -166,15 +174,6 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
                 doppler_file_ << setw(10) << measDoppler << " ";
                 doppler_file_ << setw(12) << calcDoppler << " ";
                 doppler_file_ << setw(12) << measDoppler - calcDoppler << " ";
-
-                double speed = (myPos.coords.ecefVX/100) * (myPos.coords.ecefVX/100);
-                speed += (myPos.coords.ecefVY/100) * (myPos.coords.ecefVY/100);
-                speed += (myPos.coords.ecefVZ/100) * (myPos.coords.ecefVZ/100);
-                speed = sqrt(speed);
-                doppler_file_ << setw(11) << speed << " ";
-
-                doppler_file_ << setw(12) << speed - myPos.speed_diff << " ";
-
                 doppler_file_ << "0 0 0 0 0 " << raw_meas.iTow << endl;
 
                // Calculated moving average
@@ -365,33 +364,45 @@ void NavData(ublox::NavSol nav_data, double time_stamp) {
 
 }
 void NavData_spoofed(ublox::NavSol nav_data, double time_stamp) {
-  static double oldlat;
-  static double oldlon;
-    try{
-      double a = 6378137;
-      double e = 8.1819190842622e-2;
-      double x = nav_data.ecefX/100.;
-      double y = nav_data.ecefY/100.;
-      double z = nav_data.ecefZ/100.;
-      double asq = a*a;
-      double esq = e*e;
-      double b = sqrt(asq*(1-esq));
-      double bsq = b*b;
-      double ep = sqrt((asq-bsq)/bsq);
-      double p = sqrt(x*x+y*y);
-      double th = atan2(a*z, b*p);
-      double lon = atan2(y,x) * 57.2958;
-      double lat = atan2(z+ep*ep*b*pow(sin(th), 3), (p - esq*a*pow(cos(th), 3))) * 57.2958;
-      double direction = -(atan2(lat - oldlat, lon - oldlon) * 57.2958) + 90;
-           speed_spoofed_file << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. <<
-           " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
+  if (nav_data.gpsFix == 3 )
+  {
+    myPos.isfix = true;
+    static double oldlat;
+    static double oldlon;
+      try{
+        double a = 6378137;
+        double e = 8.1819190842622e-2;
+        double x = nav_data.ecefX/100.;
+        double y = nav_data.ecefY/100.;
+        double z = nav_data.ecefZ/100.;
+        double asq = a*a;
+        double esq = e*e;
+        double b = sqrt(asq*(1-esq));
+        double bsq = b*b;
+        double ep = sqrt((asq-bsq)/bsq);
+        double p = sqrt(x*x+y*y);
+        double th = atan2(a*z, b*p);
+        double lon = atan2(y,x) * 57.2958;
+        double lat = atan2(z+ep*ep*b*pow(sin(th), 3), (p - esq*a*pow(cos(th), 3))) * 57.2958;
+        double direction = -(atan2(lat - oldlat, lon - oldlon) * 57.2958) + 90;
+             speed_spoofed_file << setw(17) << nav_data.ecefVX/100. << " " << setw(17) <<  nav_data.ecefVY/100. <<
+             " " << setw(17) << nav_data.ecefVZ/100. << " " <<  setw(17)  << direction << " ";
 
-           speed_spoofed_file << setw(11) << nav_data.iTOW / 1000 << endl;
-           myPos.speed_diff = sqrt(pow((nav_data.ecefVX/100),2)+pow((nav_data.ecefVY/100),2)+pow((nav_data.ecefVZ/100),2));
-           myPos.speed_diff -= sqrt(pow((myPos.coords.ecefVX/100),2)+pow((myPos.coords.ecefVY/100),2)+pow((myPos.coords.ecefVZ/100),2));
+             speed_spoofed_file << setw(11) << nav_data.iTOW / 1000 << endl;
+             //spoofed speed - actual speed
+             myPos.speed_diff = sqrt(pow((nav_data.ecefVX/100),2)+pow((nav_data.ecefVY/100),2)+pow((nav_data.ecefVZ/100),2));
+             myPos.speed_diff -= sqrt(pow((myPos.coords.ecefVX/100),2)+pow((myPos.coords.ecefVY/100),2)+pow((myPos.coords.ecefVZ/100),2));
+             myPos.spoofed_speed.ecefVX = nav_data.ecefVX;
+             myPos.spoofed_speed.ecefVY = nav_data.ecefVY;
+             myPos.spoofed_speed.ecefVZ = nav_data.ecefVZ;
+             myPos.spoofed_speed.defined = true;
 
-    } catch (std::exception &e) {
-        std::cout << "Navigation Solution Error";
+      } catch (std::exception &e) {
+          std::cout << "Navigation Solution Error";
+      }
+    }
+    else{
+      myPos.isfix = false;
     }
 
 }
@@ -439,7 +450,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    
+
     std::string port(argv[1]);
     int baudrate=115200;
     istringstream(argv[2]) >> baudrate;
@@ -476,6 +487,7 @@ int main(int argc, char **argv)
       //my_gps.ConfigureMessageRate(0x01,0x06,1);
     if(argc == 3)
     {
+      myPos.isfix = true;
       my_gps.set_nav_solution_callback(NavData);
       my_gps.ConfigureMessageRate(0x01,0x06,1);
     }
