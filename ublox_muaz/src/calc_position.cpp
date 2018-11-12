@@ -243,11 +243,17 @@ double Position::calcDoppler(int id, double _time, Position myPos)
 
    if(myPos.spoofed_speed.defined)//I am being spoofed
    {
-   		float spoofed_mag = sqrt(pow((myPos.spoofed_speed.ecefVX/100),2)+pow((myPos.spoofed_speed.ecefVY/100),2)+pow((myPos.spoofed_speed.ecefVZ/100),2));
-   		float act_mag = sqrt(pow((myPos.coords.ecefVX/100),2)+pow((myPos.coords.ecefVY/100),2)+pow((myPos.coords.ecefVZ/100),2));
-   		myPos.coords.ecefVX = myPos.coords.ecefVX*spoofed_mag/act_mag;
-   		myPos.coords.ecefVY = myPos.coords.ecefVY*spoofed_mag/act_mag;
-   		myPos.coords.ecefVZ = myPos.coords.ecefVZ*spoofed_mag/act_mag;
+   		float spoofed_mag = sqrt(pow((myPos.spoofed_speed.ecefVX),2)+pow((myPos.spoofed_speed.ecefVY),2)+pow((myPos.spoofed_speed.ecefVZ),2));
+   		float act_mag = sqrt(pow((myPos.coords.ecefVX),2)+pow((myPos.coords.ecefVY),2)+pow((myPos.coords.ecefVZ),2));
+   		if(spoofed_mag == 0)
+   			spoofed_mag = 0.1; 
+   		cout<<"Spoofed_mag "<<spoofed_mag<<" act_mag "<<act_mag<<endl;
+   		myPos.coords.ecefVX = myPos.spoofed_speed.ecefVX*act_mag/spoofed_mag;
+   		myPos.coords.ecefVY = myPos.spoofed_speed.ecefVY*act_mag/spoofed_mag;
+   		myPos.coords.ecefVZ = myPos.spoofed_speed.ecefVZ*act_mag/spoofed_mag;
+      	pos[0] = myPos.spoofed_speed.ecefX/100;
+      	pos[1] = myPos.spoofed_speed.ecefY/100;
+      	pos[2] = myPos.spoofed_speed.ecefZ/100;
    }
 
    // Calculate velocity

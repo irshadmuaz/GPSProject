@@ -90,10 +90,16 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
 	vecDop.clear();
 	for(int ii=0;ii<raw_meas.numSV; ii++)
 		if (myPos.ephemerisExists(raw_meas.rawmeasreap[ii].svid) && !raw_meas.rawmeasreap[ii].gnssId)
-                	vecDop.push_back(abs(myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler));
+                	vecDop.push_back((myPos.calcDoppler(raw_meas.rawmeasreap[ii].svid, (double)raw_meas.iTow, myPos) - raw_meas.rawmeasreap[ii].doppler));
+
 	sort(vecDop.begin(), vecDop.end());
 	prevMedian = vecDop.at((int)(vecDop.size() / 2));
-  if(myPos.isfix)
+  for(int i=0; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
+    {
+      vecDop[i] = abs(vecDop[i] - prevMedian);
+    }
+  sort(vecDop.begin(),vecDop.end());
+  if(myPos.isfix && myPos.spoofed_speed.defined)
   {
     /*=============================================================*/
     const int numberofmodes = vecDop.size();//5;//This indicates the number of satellites to pick with maximum deviation
@@ -118,12 +124,13 @@ void PseudorangeData(ublox::RawMeas raw_meas, double time_stamp) {
     float top_mean = 0.0;
     int top = 3;
     sum = 0.0;
+
     for(int i=vecDop.size()-top; i < vecDop.size();i++)//Calculate mean deviation of top numberofmodes
     {
-      sum += abs(vecDop[i] - prevMedian);
+      sum += vecDop[i];
     }
     top_mean = sum/top;
-    cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" m "<<m<<" top_mean: "<<top_mean<<endl;
+    cout<<"Deviation: "<<deviation<<"mean: "<<mean<<" m "<<m<<" top_mean: "<<top_mean<<" Speed_diff: "<<myPos.speed_diff<<endl;
     for(int i=0;i<thresholds;i++)
     {
       if(deviation > i)
@@ -403,6 +410,9 @@ void NavData_spoofed(ublox::NavSol nav_data, double time_stamp) {
              myPos.spoofed_speed.ecefVX = nav_data.ecefVX;
              myPos.spoofed_speed.ecefVY = nav_data.ecefVY;
              myPos.spoofed_speed.ecefVZ = nav_data.ecefVZ;
+             myPos.spoofed_speed.ecefX = nav_data.ecefX;
+             myPos.spoofed_speed.ecefY = nav_data.ecefY;
+             myPos.spoofed_speed.ecefZ = nav_data.ecefZ;
              myPos.spoofed_speed.defined = true;
 
       } catch (std::exception &e) {
@@ -501,6 +511,7 @@ int main(int argc, char **argv)
     }
     else
     {
+      myPos.isfix = false;
       my_gps.set_nav_solution_callback(NavData_spoofed);
       my_gps.ConfigureMessageRate(0x01,0x06,1);
     }
