@@ -37,6 +37,7 @@ public:
    ecef coords;
    ecef spoofed_speed;
 	 double speed_diff;
+    double heading;
     bool isfix = false;
 };
 
